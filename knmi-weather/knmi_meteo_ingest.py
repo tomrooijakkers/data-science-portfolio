@@ -1,10 +1,33 @@
 import io
+import os
+import json
 import datetime
 import requests
 import pandas as pd
 
-from knmiclasses import (KNMIMeteoStation,
-                         KNMIMeteoStationList)
+
+def load_json_to_df(filename: str, datakey: str) -> pd.DataFrame:
+    """Load metadata JSON to pd.DataFrame."""
+    with open(os.path.join("metadata", filename)) as f:
+        data = json.load(f)
+        df = pd.DataFrame.from_records(data["stations"])
+    
+    return df
+
+
+def knmi_load_meteo_stations() -> pd.DataFrame:
+    """Load meteo station metadata as pd.DataFrame."""
+    return load_json_to_df("knmi_meteo_stations.json", "stations")
+
+
+def knmi_load_daily_parameters() -> pd.DataFrame:
+    """Load day param. metadata as pd.DataFrame."""
+    return load_json_to_df("knmi_parameters_daily.json", "parameters")
+
+
+def knmi_load_hourly_parameters() -> pd.DataFrame:
+    """Load hour param. metadata as pd.DataFrame."""
+    return load_json_to_df("knmi_parameters_hourly.json", "parameters")
 
 
 def knmi_response_content_to_df(knmi_response_content: bytes) -> pd.DataFrame:
@@ -55,7 +78,7 @@ def knmi_meteo_to_df(meteo_stns_list: list | None,
                      end_date: datetime.date | datetime.datetime,
                      mode: str = 'day') -> pd.DataFrame:
     """
-    Convert day/hr KNMI automatic meteo station data to a Pandas DataFrame.
+    Convert day/hr KNMI automatic meteo station data to pd.DataFrame.
 
     Parameters
     ----------

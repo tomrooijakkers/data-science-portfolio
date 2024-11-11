@@ -12,7 +12,7 @@ class KNMIMeteoStation:
 
 class KNMIMeteoStationList:
     def __init__(self):
-            self.stations_floc = "datafiles/knmi_meteo_stations.json"
+            self.stations_floc = "metadata/knmi_meteo_stations.json"
             self.stations = self.get_saved_stations(self.stations_floc)
     
 

@@ -159,7 +159,7 @@ def knmi_update_meteo_station_metadata(sourceurl: str,
                            "stations", datafile)
 
 
-def knmi_update_metadata() -> None:
+def knmi_update_all_metadata() -> None:
     """Update all KNMI metadata files."""
     d_sourceurl = "https://daggegevens.knmi.nl/klimatologie/daggegevens"
     h_sourceurl = "https://daggegevens.knmi.nl/klimatologie/uurgegevens"
