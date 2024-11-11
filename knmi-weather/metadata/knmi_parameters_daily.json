@@ -1,0 +1,162 @@
+{
+  "last_updated": "2024-11-11 16:08 UTC",
+  "source": "https://daggegevens.knmi.nl/klimatologie/daggegevens",
+  "parameters": [
+    {
+      "parameter_code": "DDVEC",
+      "parameter_desc": "Vectorgemiddelde windrichting in graden (360=noord, 90=oost, 180=zuid, 270=west, 0=windstil/variabel)"
+    },
+    {
+      "parameter_code": "FHVEC",
+      "parameter_desc": "Vectorgemiddelde windsnelheid (in 0.1 m/s)"
+    },
+    {
+      "parameter_code": "FG",
+      "parameter_desc": "Etmaalgemiddelde windsnelheid (in 0.1 m/s)"
+    },
+    {
+      "parameter_code": "FHX",
+      "parameter_desc": "Hoogste uurgemiddelde windsnelheid (in 0.1 m/s)"
+    },
+    {
+      "parameter_code": "FHXH",
+      "parameter_desc": "Uurvak waarin FHX is gemeten"
+    },
+    {
+      "parameter_code": "FHN",
+      "parameter_desc": "Laagste uurgemiddelde windsnelheid (in 0.1 m/s)"
+    },
+    {
+      "parameter_code": "FHNH",
+      "parameter_desc": "Uurvak waarin FHN is gemeten"
+    },
+    {
+      "parameter_code": "FXX",
+      "parameter_desc": "Hoogste windstoot (in 0.1 m/s)"
+    },
+    {
+      "parameter_code": "FXXH",
+      "parameter_desc": "Uurvak waarin FXX is gemeten"
+    },
+    {
+      "parameter_code": "TG",
+      "parameter_desc": "Etmaalgemiddelde temperatuur (in 0.1 graden Celsius)"
+    },
+    {
+      "parameter_code": "TN",
+      "parameter_desc": "Minimum temperatuur (in 0.1 graden Celsius)"
+    },
+    {
+      "parameter_code": "TNH",
+      "parameter_desc": "Uurvak waarin TN is gemeten"
+    },
+    {
+      "parameter_code": "TX",
+      "parameter_desc": "Maximum temperatuur (in 0.1 graden Celsius)"
+    },
+    {
+      "parameter_code": "TXH",
+      "parameter_desc": "Uurvak waarin TX is gemeten"
+    },
+    {
+      "parameter_code": "T10N",
+      "parameter_desc": "Minimum temperatuur op 10 cm hoogte (in 0.1 graden Celsius)"
+    },
+    {
+      "parameter_code": "T10NH",
+      "parameter_desc": "6-uurs tijdvak waarin T10N is gemeten 6=0-6 UT, 12=6-12 UT, 18=12-18 UT, 24=18-24 UT"
+    },
+    {
+      "parameter_code": "SQ",
+      "parameter_desc": "Zonneschijnduur (in 0.1 uur) berekend uit de globale straling (-1 voor <0.05 uur)"
+    },
+    {
+      "parameter_code": "SP",
+      "parameter_desc": "Percentage van de langst mogelijke zonneschijnduur"
+    },
+    {
+      "parameter_code": "Q",
+      "parameter_desc": "Globale straling (in J/cm2)"
+    },
+    {
+      "parameter_code": "DR",
+      "parameter_desc": "Duur van de neerslag (in 0.1 uur)"
+    },
+    {
+      "parameter_code": "RH",
+      "parameter_desc": "Etmaalsom van de neerslag (in 0.1 mm) (-1 voor <0.05 mm)"
+    },
+    {
+      "parameter_code": "RHX",
+      "parameter_desc": "Hoogste uursom van de neerslag (in 0.1 mm) (-1 voor <0.05 mm)"
+    },
+    {
+      "parameter_code": "RHXH",
+      "parameter_desc": "Uurvak waarin RHX is gemeten"
+    },
+    {
+      "parameter_code": "PG",
+      "parameter_desc": "Etmaalgemiddelde luchtdruk herleid tot zeeniveau (in 0.1 hPa) berekend uit 24 uurwaarden"
+    },
+    {
+      "parameter_code": "PX",
+      "parameter_desc": "Hoogste uurwaarde van de luchtdruk herleid tot zeeniveau (in 0.1 hPa)"
+    },
+    {
+      "parameter_code": "PXH",
+      "parameter_desc": "Uurvak waarin PX is gemeten / Hourly division in which PX was measured"
+    },
+    {
+      "parameter_code": "PN",
+      "parameter_desc": "Laagste uurwaarde van de luchtdruk herleid tot zeeniveau (in 0.1 hPa)"
+    },
+    {
+      "parameter_code": "PNH",
+      "parameter_desc": "Uurvak waarin PN is gemeten / Hourly division in which PN was measured"
+    },
+    {
+      "parameter_code": "VVN",
+      "parameter_desc": "Minimum opgetreden zicht; 0: <100 m, 1:100-200 m, 2:200-300 m,..., 49:4900-5000 m, 50:5-6 km, 56:6-7 km, 57:7-8 km,..., 79:29-30 km, 80:30-35 km, 81:35-40 km,..., 89"
+    },
+    {
+      "parameter_code": "VVNH",
+      "parameter_desc": "Uurvak waarin VVN is gemeten / Hourly division in which VVN was measured"
+    },
+    {
+      "parameter_code": "VVX",
+      "parameter_desc": "Maximum opgetreden zicht; 0: <100 m, 1:100-200 m, 2:200-300 m,..., 49:4900-5000 m, 50:5-6 km, 56:6-7 km, 57:7-8 km,..., 79:29-30 km, 80:30-35 km, 81:35-40 km,..., 89"
+    },
+    {
+      "parameter_code": "VVXH",
+      "parameter_desc": "Uurvak waarin VVX is gemeten"
+    },
+    {
+      "parameter_code": "NG",
+      "parameter_desc": "Etmaalgemiddelde bewolking (bedekkingsgraad van de bovenlucht in achtsten, 9=bovenlucht onzichtbaar)"
+    },
+    {
+      "parameter_code": "UG",
+      "parameter_desc": "Etmaalgemiddelde relatieve vochtigheid (in procenten)"
+    },
+    {
+      "parameter_code": "UX",
+      "parameter_desc": "Maximale relatieve vochtigheid (in procenten)"
+    },
+    {
+      "parameter_code": "UXH",
+      "parameter_desc": "Uurvak waarin UX is gemeten"
+    },
+    {
+      "parameter_code": "UN",
+      "parameter_desc": "Minimale relatieve vochtigheid (in procenten)"
+    },
+    {
+      "parameter_code": "UNH",
+      "parameter_desc": "Uurvak waarin UN is gemeten"
+    },
+    {
+      "parameter_code": "EV24",
+      "parameter_desc": "Referentiegewasverdamping (Makkink) (in 0.1 mm)"
+    }
+  ]
+}

@@ -10,15 +10,15 @@ class KNMIMeteoStation:
         return f"{self.__class__.__name__}({self.station_code}, {self.location_name}"
 
 
-class CachedKNMIMeteoStations:
+class KNMIMeteoStationList:
     def __init__(self):
             self.stations_floc = "datafiles/knmi_meteo_stations.json"
-            self.stations = self.get_cached_stations(self.stations_floc)
+            self.stations = self.get_saved_stations(self.stations_floc)
     
 
-    def get_cached_stations(self, cache_loc: str) -> list[dict]:
-        """Load cached stations from JSON file to Python."""
-        with open(cache_loc) as f:
-            cached_stations = json.load(f)
+    def get_saved_stations(self, saved_loc: str) -> list[dict]:
+        """Load saved stations from JSON file to Python."""
+        with open(saved_loc) as f:
+            saved_stations = json.load(f)
 
-        return cached_stations
+        return saved_stations

@@ -1,0 +1,356 @@
+{
+  "last_updated": "2024-11-11 16:08 UTC",
+  "source": "https://daggegevens.knmi.nl/klimatologie/daggegevens",
+  "stations": [
+    {
+      "station_code": 209,
+      "longitude": 4.518,
+      "latitude": 52.465,
+      "altitude": 0.0,
+      "location_name": "IJmond"
+    },
+    {
+      "station_code": 210,
+      "longitude": 4.43,
+      "latitude": 52.171,
+      "altitude": -0.2,
+      "location_name": "Valkenburg Zh"
+    },
+    {
+      "station_code": 215,
+      "longitude": 4.437,
+      "latitude": 52.141,
+      "altitude": -1.1,
+      "location_name": "Voorschoten"
+    },
+    {
+      "station_code": 225,
+      "longitude": 4.555,
+      "latitude": 52.463,
+      "altitude": 4.4,
+      "location_name": "IJmuiden"
+    },
+    {
+      "station_code": 235,
+      "longitude": 4.781,
+      "latitude": 52.928,
+      "altitude": 1.2,
+      "location_name": "De Kooy"
+    },
+    {
+      "station_code": 240,
+      "longitude": 4.79,
+      "latitude": 52.318,
+      "altitude": -3.3,
+      "location_name": "Schiphol"
+    },
+    {
+      "station_code": 242,
+      "longitude": 4.921,
+      "latitude": 53.241,
+      "altitude": 10.8,
+      "location_name": "Vlieland"
+    },
+    {
+      "station_code": 248,
+      "longitude": 5.174,
+      "latitude": 52.634,
+      "altitude": 0.8,
+      "location_name": "Wijdenes"
+    },
+    {
+      "station_code": 249,
+      "longitude": 4.979,
+      "latitude": 52.644,
+      "altitude": -2.4,
+      "location_name": "Berkhout"
+    },
+    {
+      "station_code": 251,
+      "longitude": 5.346,
+      "latitude": 53.392,
+      "altitude": 0.7,
+      "location_name": "Hoorn Terschelling"
+    },
+    {
+      "station_code": 257,
+      "longitude": 4.603,
+      "latitude": 52.506,
+      "altitude": 8.5,
+      "location_name": "Wijk aan Zee"
+    },
+    {
+      "station_code": 258,
+      "longitude": 5.401,
+      "latitude": 52.649,
+      "altitude": 7.3,
+      "location_name": "Houtribdijk"
+    },
+    {
+      "station_code": 260,
+      "longitude": 5.18,
+      "latitude": 52.1,
+      "altitude": 1.9,
+      "location_name": "De Bilt"
+    },
+    {
+      "station_code": 265,
+      "longitude": 5.274,
+      "latitude": 52.13,
+      "altitude": 13.9,
+      "location_name": "Soesterberg"
+    },
+    {
+      "station_code": 267,
+      "longitude": 5.384,
+      "latitude": 52.898,
+      "altitude": -1.3,
+      "location_name": "Stavoren"
+    },
+    {
+      "station_code": 269,
+      "longitude": 5.52,
+      "latitude": 52.458,
+      "altitude": -3.7,
+      "location_name": "Lelystad"
+    },
+    {
+      "station_code": 270,
+      "longitude": 5.752,
+      "latitude": 53.224,
+      "altitude": 1.2,
+      "location_name": "Leeuwarden"
+    },
+    {
+      "station_code": 273,
+      "longitude": 5.888,
+      "latitude": 52.703,
+      "altitude": -3.3,
+      "location_name": "Marknesse"
+    },
+    {
+      "station_code": 275,
+      "longitude": 5.873,
+      "latitude": 52.056,
+      "altitude": 48.2,
+      "location_name": "Deelen"
+    },
+    {
+      "station_code": 277,
+      "longitude": 6.2,
+      "latitude": 53.413,
+      "altitude": 2.9,
+      "location_name": "Lauwersoog"
+    },
+    {
+      "station_code": 278,
+      "longitude": 6.259,
+      "latitude": 52.435,
+      "altitude": 3.6,
+      "location_name": "Heino"
+    },
+    {
+      "station_code": 279,
+      "longitude": 6.574,
+      "latitude": 52.75,
+      "altitude": 15.8,
+      "location_name": "Hoogeveen"
+    },
+    {
+      "station_code": 280,
+      "longitude": 6.585,
+      "latitude": 53.125,
+      "altitude": 5.2,
+      "location_name": "Eelde"
+    },
+    {
+      "station_code": 283,
+      "longitude": 6.657,
+      "latitude": 52.069,
+      "altitude": 29.1,
+      "location_name": "Hupsel"
+    },
+    {
+      "station_code": 285,
+      "longitude": 6.399,
+      "latitude": 53.575,
+      "altitude": 0.0,
+      "location_name": "Huibertgat"
+    },
+    {
+      "station_code": 286,
+      "longitude": 7.15,
+      "latitude": 53.196,
+      "altitude": -0.2,
+      "location_name": "Nieuw Beerta"
+    },
+    {
+      "station_code": 290,
+      "longitude": 6.891,
+      "latitude": 52.274,
+      "altitude": 34.8,
+      "location_name": "Twenthe"
+    },
+    {
+      "station_code": 308,
+      "longitude": 3.379,
+      "latitude": 51.381,
+      "altitude": 0.0,
+      "location_name": "Cadzand"
+    },
+    {
+      "station_code": 310,
+      "longitude": 3.596,
+      "latitude": 51.442,
+      "altitude": 8.0,
+      "location_name": "Vlissingen"
+    },
+    {
+      "station_code": 311,
+      "longitude": 3.672,
+      "latitude": 51.379,
+      "altitude": 0.0,
+      "location_name": "Hoofdplaat"
+    },
+    {
+      "station_code": 312,
+      "longitude": 3.622,
+      "latitude": 51.768,
+      "altitude": 0.0,
+      "location_name": "Oosterschelde"
+    },
+    {
+      "station_code": 313,
+      "longitude": 3.242,
+      "latitude": 51.505,
+      "altitude": 0.0,
+      "location_name": "Vlakte van De Raan"
+    },
+    {
+      "station_code": 315,
+      "longitude": 3.998,
+      "latitude": 51.447,
+      "altitude": 0.0,
+      "location_name": "Hansweert"
+    },
+    {
+      "station_code": 316,
+      "longitude": 3.694,
+      "latitude": 51.657,
+      "altitude": 0.0,
+      "location_name": "Schaar"
+    },
+    {
+      "station_code": 319,
+      "longitude": 3.861,
+      "latitude": 51.226,
+      "altitude": 1.7,
+      "location_name": "Westdorpe"
+    },
+    {
+      "station_code": 323,
+      "longitude": 3.884,
+      "latitude": 51.527,
+      "altitude": 1.4,
+      "location_name": "Wilhelminadorp"
+    },
+    {
+      "station_code": 324,
+      "longitude": 4.006,
+      "latitude": 51.596,
+      "altitude": 0.0,
+      "location_name": "Stavenisse"
+    },
+    {
+      "station_code": 330,
+      "longitude": 4.122,
+      "latitude": 51.992,
+      "altitude": 11.9,
+      "location_name": "Hoek van Holland"
+    },
+    {
+      "station_code": 331,
+      "longitude": 4.193,
+      "latitude": 51.48,
+      "altitude": 0.0,
+      "location_name": "Tholen"
+    },
+    {
+      "station_code": 340,
+      "longitude": 4.342,
+      "latitude": 51.449,
+      "altitude": 19.2,
+      "location_name": "Woensdrecht"
+    },
+    {
+      "station_code": 343,
+      "longitude": 4.313,
+      "latitude": 51.893,
+      "altitude": 3.5,
+      "location_name": "Rotterdam Geulhaven"
+    },
+    {
+      "station_code": 344,
+      "longitude": 4.447,
+      "latitude": 51.962,
+      "altitude": -4.3,
+      "location_name": "Rotterdam"
+    },
+    {
+      "station_code": 348,
+      "longitude": 4.926,
+      "latitude": 51.97,
+      "altitude": -0.7,
+      "location_name": "Cabauw Mast"
+    },
+    {
+      "station_code": 350,
+      "longitude": 4.936,
+      "latitude": 51.566,
+      "altitude": 14.9,
+      "location_name": "Gilze-Rijen"
+    },
+    {
+      "station_code": 356,
+      "longitude": 5.146,
+      "latitude": 51.859,
+      "altitude": 0.7,
+      "location_name": "Herwijnen"
+    },
+    {
+      "station_code": 370,
+      "longitude": 5.377,
+      "latitude": 51.451,
+      "altitude": 22.6,
+      "location_name": "Eindhoven"
+    },
+    {
+      "station_code": 375,
+      "longitude": 5.707,
+      "latitude": 51.659,
+      "altitude": 22.0,
+      "location_name": "Volkel"
+    },
+    {
+      "station_code": 377,
+      "longitude": 5.763,
+      "latitude": 51.198,
+      "altitude": 30.0,
+      "location_name": "Ell"
+    },
+    {
+      "station_code": 380,
+      "longitude": 5.762,
+      "latitude": 50.906,
+      "altitude": 114.3,
+      "location_name": "Maastricht"
+    },
+    {
+      "station_code": 391,
+      "longitude": 6.197,
+      "latitude": 51.498,
+      "altitude": 19.5,
+      "location_name": "Arcen"
+    }
+  ]
+}

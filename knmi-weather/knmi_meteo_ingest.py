@@ -1,50 +1,10 @@
 import io
-import urllib
 import datetime
 import requests
 import pandas as pd
-import lxml.html as lh
 
 from knmiclasses import (KNMIMeteoStation,
-                         CachedKNMIMeteoStations)
-
-
-# TIP: This function is only needed to update metadata / dataset -> maybe move to "metadata_update" o.i.d.?
-def knmi_get_all_station_codes(url: str) -> list[dict]:
-    """Retrieve all station codes from the KNMI URL."""
-    # Get HTML content of web site
-    html_content = urllib.request.urlopen(url).read()
-
-    # Find all station elements on the page (using class "station")
-    station_elements = lh.fromstring(html_content).find_class("station")
-
-    stations = []
-
-    # Extract text for each station, convert to list of dicts
-    for station_el in station_elements:
-        station_text = station_el.text_content().strip().split(": ")
-        stations.append({"station_code": station_text[0],
-                         "location_name": station_text[-1]})
-    
-    # Raise an error if less than two stations were found (something must have gone wrong then)
-    if len(stations) < 2:
-        raise AssertionError(f"Incomplete or empty station list (len: {len(stations)} returned.")
-    
-    return stations
-
-
-# TIP: This function is only needed to update metadata / dataset -> maybe move to "metadata_update" o.i.d.?
-def knmi_get_all_daily_stations() -> list[dict]:
-    """Retrieve all daily station codes from KNMI URL."""
-    stations = knmi_get_all_station_codes("https://daggegevens.knmi.nl/klimatologie/daggegevens")
-    return stations
-
-
-# TIP: This function is only needed to update metadata / dataset -> maybe move to "metadata_update" o.i.d.?
-def knmi_get_all_hourly_stations() -> list[dict]:
-    """Retrieve all hourly station codes from KNMI URL."""
-    stations = knmi_get_all_station_codes("https://daggegevens.knmi.nl/klimatologie/uurgegevens")
-    return stations
+                         KNMIMeteoStationList)
 
 
 def knmi_response_content_to_df(knmi_response_content: bytes) -> pd.DataFrame:
@@ -89,9 +49,8 @@ def knmi_response_content_to_df(knmi_response_content: bytes) -> pd.DataFrame:
     return df_data
 
 
-# TIP: STNS mag ook "ALL" zijn => is het dan nog wel nodig dit zo moeilijk te maken?
-# TIP: dag en uurstations zijn hetzelfde, alleen de params kunnen verschillen!
-def knmi_meteo_to_df(meteo_stns_list: list,
+def knmi_meteo_to_df(meteo_stns_list: list | None,
+                     meteo_params_list: list[str] | None,
                      start_date: datetime.date | datetime.datetime,
                      end_date: datetime.date | datetime.datetime,
                      mode: str = 'day') -> pd.DataFrame:
@@ -100,14 +59,16 @@ def knmi_meteo_to_df(meteo_stns_list: list,
 
     Parameters
     ----------
-    meteo_stns_list : list
-        List of station IDs to get data for.
+    meteo_stns_list : list or None
+        List of station IDs to get data for. If None, uses "ALL".
+    meteo_params_list : list or None
+        List of parameter codes to include. If none, uses "ALL".
     start_date : date or datetime
         First day for which data should be downloaded.
     end_date : date or datetime
         Last day for which data should be downloaded.
     mode : str
-        Specify whether to download daily or hour-based values.
+        Specify whether to load daily or hour-based values.
 
     Returns
     -------
@@ -120,7 +81,7 @@ def knmi_meteo_to_df(meteo_stns_list: list,
                    'uur', 'u']
 
     mode_err_msg = f"Please enter a valid 'mode': {', '.join(valid_modes)}"
-    assert mode in valid_modes, mode_err_msg
+    assert mode.lower() in valid_modes, mode_err_msg
 
     # Get day or hourly data depending on the user's preference
     if mode.lower() in ['day', 'daily', 'dag', 'd']:
@@ -130,11 +91,21 @@ def knmi_meteo_to_df(meteo_stns_list: list,
         meteo_url = "https://www.daggegevens.knmi.nl/klimatologie/uurgegevens"
 
     # Get unique station IDs and define variables for data request
-    meteo_stns = list(set(meteo_stns_list))
+    if meteo_stns_list:
+        meteo_stns = list(set(meteo_stns_list))
+        meteo_stns = ":".join([str(stn).zfill(3) for stn in meteo_stns])
+    else:
+        meteo_stns = "ALL"
+
+    if meteo_params_list:
+        meteo_params = list(set(meteo_params_list))
+        meteo_params = ":".join([prm for prm in meteo_params])
+    else:
+        meteo_params = "ALL"
 
     # Collect specifications in a 'post-data' dictionary
-    post_data = {"stns": ":".join([str(stn).zfill(3) for stn in meteo_stns]),
-                 "vars": "ALL",
+    post_data = {"stns": meteo_stns,
+                 "vars": meteo_params,
                  "start": start_date.strftime('%Y%m%d'),
                  "end": end_date.strftime('%Y%m%d'),
                  "fmt": "csv"}
