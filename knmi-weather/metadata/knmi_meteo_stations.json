@@ -1,356 +1,356 @@
 {
-  "last_updated": "2024-11-11 16:08 UTC",
+  "last_updated": "2024-11-18 14:40 UTC",
   "source": "https://daggegevens.knmi.nl/klimatologie/daggegevens",
   "stations": [
     {
-      "station_code": 209,
-      "longitude": 4.518,
-      "latitude": 52.465,
-      "altitude": 0.0,
-      "location_name": "IJmond"
+      "STN": 209,
+      "LON(east)": 4.518,
+      "LAT(north)": 52.465,
+      "ALT(m)": 0.0,
+      "NAME": "IJmond"
     },
     {
-      "station_code": 210,
-      "longitude": 4.43,
-      "latitude": 52.171,
-      "altitude": -0.2,
-      "location_name": "Valkenburg Zh"
+      "STN": 210,
+      "LON(east)": 4.43,
+      "LAT(north)": 52.171,
+      "ALT(m)": -0.2,
+      "NAME": "Valkenburg Zh"
     },
     {
-      "station_code": 215,
-      "longitude": 4.437,
-      "latitude": 52.141,
-      "altitude": -1.1,
-      "location_name": "Voorschoten"
+      "STN": 215,
+      "LON(east)": 4.437,
+      "LAT(north)": 52.141,
+      "ALT(m)": -1.1,
+      "NAME": "Voorschoten"
     },
     {
-      "station_code": 225,
-      "longitude": 4.555,
-      "latitude": 52.463,
-      "altitude": 4.4,
-      "location_name": "IJmuiden"
+      "STN": 225,
+      "LON(east)": 4.555,
+      "LAT(north)": 52.463,
+      "ALT(m)": 4.4,
+      "NAME": "IJmuiden"
     },
     {
-      "station_code": 235,
-      "longitude": 4.781,
-      "latitude": 52.928,
-      "altitude": 1.2,
-      "location_name": "De Kooy"
+      "STN": 235,
+      "LON(east)": 4.781,
+      "LAT(north)": 52.928,
+      "ALT(m)": 1.2,
+      "NAME": "De Kooy"
     },
     {
-      "station_code": 240,
-      "longitude": 4.79,
-      "latitude": 52.318,
-      "altitude": -3.3,
-      "location_name": "Schiphol"
+      "STN": 240,
+      "LON(east)": 4.79,
+      "LAT(north)": 52.318,
+      "ALT(m)": -3.3,
+      "NAME": "Schiphol"
     },
     {
-      "station_code": 242,
-      "longitude": 4.921,
-      "latitude": 53.241,
-      "altitude": 10.8,
-      "location_name": "Vlieland"
+      "STN": 242,
+      "LON(east)": 4.921,
+      "LAT(north)": 53.241,
+      "ALT(m)": 10.8,
+      "NAME": "Vlieland"
     },
     {
-      "station_code": 248,
-      "longitude": 5.174,
-      "latitude": 52.634,
-      "altitude": 0.8,
-      "location_name": "Wijdenes"
+      "STN": 248,
+      "LON(east)": 5.174,
+      "LAT(north)": 52.634,
+      "ALT(m)": 0.8,
+      "NAME": "Wijdenes"
     },
     {
-      "station_code": 249,
-      "longitude": 4.979,
-      "latitude": 52.644,
-      "altitude": -2.4,
-      "location_name": "Berkhout"
+      "STN": 249,
+      "LON(east)": 4.979,
+      "LAT(north)": 52.644,
+      "ALT(m)": -2.4,
+      "NAME": "Berkhout"
     },
     {
-      "station_code": 251,
-      "longitude": 5.346,
-      "latitude": 53.392,
-      "altitude": 0.7,
-      "location_name": "Hoorn Terschelling"
+      "STN": 251,
+      "LON(east)": 5.346,
+      "LAT(north)": 53.392,
+      "ALT(m)": 0.7,
+      "NAME": "Hoorn Terschelling"
     },
     {
-      "station_code": 257,
-      "longitude": 4.603,
-      "latitude": 52.506,
-      "altitude": 8.5,
-      "location_name": "Wijk aan Zee"
+      "STN": 257,
+      "LON(east)": 4.603,
+      "LAT(north)": 52.506,
+      "ALT(m)": 8.5,
+      "NAME": "Wijk aan Zee"
     },
     {
-      "station_code": 258,
-      "longitude": 5.401,
-      "latitude": 52.649,
-      "altitude": 7.3,
-      "location_name": "Houtribdijk"
+      "STN": 258,
+      "LON(east)": 5.401,
+      "LAT(north)": 52.649,
+      "ALT(m)": 7.3,
+      "NAME": "Houtribdijk"
     },
     {
-      "station_code": 260,
-      "longitude": 5.18,
-      "latitude": 52.1,
-      "altitude": 1.9,
-      "location_name": "De Bilt"
+      "STN": 260,
+      "LON(east)": 5.18,
+      "LAT(north)": 52.1,
+      "ALT(m)": 1.9,
+      "NAME": "De Bilt"
     },
     {
-      "station_code": 265,
-      "longitude": 5.274,
-      "latitude": 52.13,
-      "altitude": 13.9,
-      "location_name": "Soesterberg"
+      "STN": 265,
+      "LON(east)": 5.274,
+      "LAT(north)": 52.13,
+      "ALT(m)": 13.9,
+      "NAME": "Soesterberg"
     },
     {
-      "station_code": 267,
-      "longitude": 5.384,
-      "latitude": 52.898,
-      "altitude": -1.3,
-      "location_name": "Stavoren"
+      "STN": 267,
+      "LON(east)": 5.384,
+      "LAT(north)": 52.898,
+      "ALT(m)": -1.3,
+      "NAME": "Stavoren"
     },
     {
-      "station_code": 269,
-      "longitude": 5.52,
-      "latitude": 52.458,
-      "altitude": -3.7,
-      "location_name": "Lelystad"
+      "STN": 269,
+      "LON(east)": 5.52,
+      "LAT(north)": 52.458,
+      "ALT(m)": -3.7,
+      "NAME": "Lelystad"
     },
     {
-      "station_code": 270,
-      "longitude": 5.752,
-      "latitude": 53.224,
-      "altitude": 1.2,
-      "location_name": "Leeuwarden"
+      "STN": 270,
+      "LON(east)": 5.752,
+      "LAT(north)": 53.224,
+      "ALT(m)": 1.2,
+      "NAME": "Leeuwarden"
     },
     {
-      "station_code": 273,
-      "longitude": 5.888,
-      "latitude": 52.703,
-      "altitude": -3.3,
-      "location_name": "Marknesse"
+      "STN": 273,
+      "LON(east)": 5.888,
+      "LAT(north)": 52.703,
+      "ALT(m)": -3.3,
+      "NAME": "Marknesse"
     },
     {
-      "station_code": 275,
-      "longitude": 5.873,
-      "latitude": 52.056,
-      "altitude": 48.2,
-      "location_name": "Deelen"
+      "STN": 275,
+      "LON(east)": 5.873,
+      "LAT(north)": 52.056,
+      "ALT(m)": 48.2,
+      "NAME": "Deelen"
     },
     {
-      "station_code": 277,
-      "longitude": 6.2,
-      "latitude": 53.413,
-      "altitude": 2.9,
-      "location_name": "Lauwersoog"
+      "STN": 277,
+      "LON(east)": 6.2,
+      "LAT(north)": 53.413,
+      "ALT(m)": 2.9,
+      "NAME": "Lauwersoog"
     },
     {
-      "station_code": 278,
-      "longitude": 6.259,
-      "latitude": 52.435,
-      "altitude": 3.6,
-      "location_name": "Heino"
+      "STN": 278,
+      "LON(east)": 6.259,
+      "LAT(north)": 52.435,
+      "ALT(m)": 3.6,
+      "NAME": "Heino"
     },
     {
-      "station_code": 279,
-      "longitude": 6.574,
-      "latitude": 52.75,
-      "altitude": 15.8,
-      "location_name": "Hoogeveen"
+      "STN": 279,
+      "LON(east)": 6.574,
+      "LAT(north)": 52.75,
+      "ALT(m)": 15.8,
+      "NAME": "Hoogeveen"
     },
     {
-      "station_code": 280,
-      "longitude": 6.585,
-      "latitude": 53.125,
-      "altitude": 5.2,
-      "location_name": "Eelde"
+      "STN": 280,
+      "LON(east)": 6.585,
+      "LAT(north)": 53.125,
+      "ALT(m)": 5.2,
+      "NAME": "Eelde"
     },
     {
-      "station_code": 283,
-      "longitude": 6.657,
-      "latitude": 52.069,
-      "altitude": 29.1,
-      "location_name": "Hupsel"
+      "STN": 283,
+      "LON(east)": 6.657,
+      "LAT(north)": 52.069,
+      "ALT(m)": 29.1,
+      "NAME": "Hupsel"
     },
     {
-      "station_code": 285,
-      "longitude": 6.399,
-      "latitude": 53.575,
-      "altitude": 0.0,
-      "location_name": "Huibertgat"
+      "STN": 285,
+      "LON(east)": 6.399,
+      "LAT(north)": 53.575,
+      "ALT(m)": 0.0,
+      "NAME": "Huibertgat"
     },
     {
-      "station_code": 286,
-      "longitude": 7.15,
-      "latitude": 53.196,
-      "altitude": -0.2,
-      "location_name": "Nieuw Beerta"
+      "STN": 286,
+      "LON(east)": 7.15,
+      "LAT(north)": 53.196,
+      "ALT(m)": -0.2,
+      "NAME": "Nieuw Beerta"
     },
     {
-      "station_code": 290,
-      "longitude": 6.891,
-      "latitude": 52.274,
-      "altitude": 34.8,
-      "location_name": "Twenthe"
+      "STN": 290,
+      "LON(east)": 6.891,
+      "LAT(north)": 52.274,
+      "ALT(m)": 34.8,
+      "NAME": "Twenthe"
     },
     {
-      "station_code": 308,
-      "longitude": 3.379,
-      "latitude": 51.381,
-      "altitude": 0.0,
-      "location_name": "Cadzand"
+      "STN": 308,
+      "LON(east)": 3.379,
+      "LAT(north)": 51.381,
+      "ALT(m)": 0.0,
+      "NAME": "Cadzand"
     },
     {
-      "station_code": 310,
-      "longitude": 3.596,
-      "latitude": 51.442,
-      "altitude": 8.0,
-      "location_name": "Vlissingen"
+      "STN": 310,
+      "LON(east)": 3.596,
+      "LAT(north)": 51.442,
+      "ALT(m)": 8.0,
+      "NAME": "Vlissingen"
     },
     {
-      "station_code": 311,
-      "longitude": 3.672,
-      "latitude": 51.379,
-      "altitude": 0.0,
-      "location_name": "Hoofdplaat"
+      "STN": 311,
+      "LON(east)": 3.672,
+      "LAT(north)": 51.379,
+      "ALT(m)": 0.0,
+      "NAME": "Hoofdplaat"
     },
     {
-      "station_code": 312,
-      "longitude": 3.622,
-      "latitude": 51.768,
-      "altitude": 0.0,
-      "location_name": "Oosterschelde"
+      "STN": 312,
+      "LON(east)": 3.622,
+      "LAT(north)": 51.768,
+      "ALT(m)": 0.0,
+      "NAME": "Oosterschelde"
     },
     {
-      "station_code": 313,
-      "longitude": 3.242,
-      "latitude": 51.505,
-      "altitude": 0.0,
-      "location_name": "Vlakte van De Raan"
+      "STN": 313,
+      "LON(east)": 3.242,
+      "LAT(north)": 51.505,
+      "ALT(m)": 0.0,
+      "NAME": "Vlakte van De Raan"
     },
     {
-      "station_code": 315,
-      "longitude": 3.998,
-      "latitude": 51.447,
-      "altitude": 0.0,
-      "location_name": "Hansweert"
+      "STN": 315,
+      "LON(east)": 3.998,
+      "LAT(north)": 51.447,
+      "ALT(m)": 0.0,
+      "NAME": "Hansweert"
     },
     {
-      "station_code": 316,
-      "longitude": 3.694,
-      "latitude": 51.657,
-      "altitude": 0.0,
-      "location_name": "Schaar"
+      "STN": 316,
+      "LON(east)": 3.694,
+      "LAT(north)": 51.657,
+      "ALT(m)": 0.0,
+      "NAME": "Schaar"
     },
     {
-      "station_code": 319,
-      "longitude": 3.861,
-      "latitude": 51.226,
-      "altitude": 1.7,
-      "location_name": "Westdorpe"
+      "STN": 319,
+      "LON(east)": 3.861,
+      "LAT(north)": 51.226,
+      "ALT(m)": 1.7,
+      "NAME": "Westdorpe"
     },
     {
-      "station_code": 323,
-      "longitude": 3.884,
-      "latitude": 51.527,
-      "altitude": 1.4,
-      "location_name": "Wilhelminadorp"
+      "STN": 323,
+      "LON(east)": 3.884,
+      "LAT(north)": 51.527,
+      "ALT(m)": 1.4,
+      "NAME": "Wilhelminadorp"
     },
     {
-      "station_code": 324,
-      "longitude": 4.006,
-      "latitude": 51.596,
-      "altitude": 0.0,
-      "location_name": "Stavenisse"
+      "STN": 324,
+      "LON(east)": 4.006,
+      "LAT(north)": 51.596,
+      "ALT(m)": 0.0,
+      "NAME": "Stavenisse"
     },
     {
-      "station_code": 330,
-      "longitude": 4.122,
-      "latitude": 51.992,
-      "altitude": 11.9,
-      "location_name": "Hoek van Holland"
+      "STN": 330,
+      "LON(east)": 4.122,
+      "LAT(north)": 51.992,
+      "ALT(m)": 11.9,
+      "NAME": "Hoek van Holland"
     },
     {
-      "station_code": 331,
-      "longitude": 4.193,
-      "latitude": 51.48,
-      "altitude": 0.0,
-      "location_name": "Tholen"
+      "STN": 331,
+      "LON(east)": 4.193,
+      "LAT(north)": 51.48,
+      "ALT(m)": 0.0,
+      "NAME": "Tholen"
     },
     {
-      "station_code": 340,
-      "longitude": 4.342,
-      "latitude": 51.449,
-      "altitude": 19.2,
-      "location_name": "Woensdrecht"
+      "STN": 340,
+      "LON(east)": 4.342,
+      "LAT(north)": 51.449,
+      "ALT(m)": 19.2,
+      "NAME": "Woensdrecht"
     },
     {
-      "station_code": 343,
-      "longitude": 4.313,
-      "latitude": 51.893,
-      "altitude": 3.5,
-      "location_name": "Rotterdam Geulhaven"
+      "STN": 343,
+      "LON(east)": 4.313,
+      "LAT(north)": 51.893,
+      "ALT(m)": 3.5,
+      "NAME": "Rotterdam Geulhaven"
     },
     {
-      "station_code": 344,
-      "longitude": 4.447,
-      "latitude": 51.962,
-      "altitude": -4.3,
-      "location_name": "Rotterdam"
+      "STN": 344,
+      "LON(east)": 4.447,
+      "LAT(north)": 51.962,
+      "ALT(m)": -4.3,
+      "NAME": "Rotterdam"
     },
     {
-      "station_code": 348,
-      "longitude": 4.926,
-      "latitude": 51.97,
-      "altitude": -0.7,
-      "location_name": "Cabauw Mast"
+      "STN": 348,
+      "LON(east)": 4.926,
+      "LAT(north)": 51.97,
+      "ALT(m)": -0.7,
+      "NAME": "Cabauw Mast"
     },
     {
-      "station_code": 350,
-      "longitude": 4.936,
-      "latitude": 51.566,
-      "altitude": 14.9,
-      "location_name": "Gilze-Rijen"
+      "STN": 350,
+      "LON(east)": 4.936,
+      "LAT(north)": 51.566,
+      "ALT(m)": 14.9,
+      "NAME": "Gilze-Rijen"
     },
     {
-      "station_code": 356,
-      "longitude": 5.146,
-      "latitude": 51.859,
-      "altitude": 0.7,
-      "location_name": "Herwijnen"
+      "STN": 356,
+      "LON(east)": 5.146,
+      "LAT(north)": 51.859,
+      "ALT(m)": 0.7,
+      "NAME": "Herwijnen"
     },
     {
-      "station_code": 370,
-      "longitude": 5.377,
-      "latitude": 51.451,
-      "altitude": 22.6,
-      "location_name": "Eindhoven"
+      "STN": 370,
+      "LON(east)": 5.377,
+      "LAT(north)": 51.451,
+      "ALT(m)": 22.6,
+      "NAME": "Eindhoven"
     },
     {
-      "station_code": 375,
-      "longitude": 5.707,
-      "latitude": 51.659,
-      "altitude": 22.0,
-      "location_name": "Volkel"
+      "STN": 375,
+      "LON(east)": 5.707,
+      "LAT(north)": 51.659,
+      "ALT(m)": 22.0,
+      "NAME": "Volkel"
     },
     {
-      "station_code": 377,
-      "longitude": 5.763,
-      "latitude": 51.198,
-      "altitude": 30.0,
-      "location_name": "Ell"
+      "STN": 377,
+      "LON(east)": 5.763,
+      "LAT(north)": 51.198,
+      "ALT(m)": 30.0,
+      "NAME": "Ell"
     },
     {
-      "station_code": 380,
-      "longitude": 5.762,
-      "latitude": 50.906,
-      "altitude": 114.3,
-      "location_name": "Maastricht"
+      "STN": 380,
+      "LON(east)": 5.762,
+      "LAT(north)": 50.906,
+      "ALT(m)": 114.3,
+      "NAME": "Maastricht"
     },
     {
-      "station_code": 391,
-      "longitude": 6.197,
-      "latitude": 51.498,
-      "altitude": 19.5,
-      "location_name": "Arcen"
+      "STN": 391,
+      "LON(east)": 6.197,
+      "LAT(north)": 51.498,
+      "ALT(m)": 19.5,
+      "NAME": "Arcen"
     }
   ]
 }

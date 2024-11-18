@@ -1,3 +1,29 @@
+"""KNMI Update Metadata
+
+This script updates and overwrites the files in subfolder `metadata`.
+
+This script requires that `pandas`, `requests`, `urllib`, `lxml`
+and `cssselect` be installed within the Python environment you
+are running this script in.
+
+Furthermore a stable internet connection and the availability of the
+KNMI script data retrieval service are required.
+
+This file can also be imported as a module and contains the following
+functions:
+
+    * knmi_get_all_parameter_codes - scrape all param codes from URL
+    * write_to_json_datafile - load dictlist to JSON in folder
+    * knmi_update_parameter_metadata - scrape and save param data
+    * knmi_station_content_to_df - parse KNMI byte-response to df
+    * knmi_update_meteo_station_metadata - fetch and save station data
+    * knmi_update_all_metadata - wrapper to run all above functions
+
+
+For more info on the KNMI script data retrieval services, please see:
+https://www.knmi.nl/kennis-en-datacentrum/achtergrond/data-ophalen-vanuit-een-script
+"""
+
 import os
 import io
 import re
@@ -145,14 +171,9 @@ def knmi_update_meteo_station_metadata(sourceurl: str,
 
     # Transform the content of the KNMI response to a DataFrame
     df_stations = knmi_station_content_to_df(response.content)
-
-    # Prettify column names
-    col_map = {"STN": "station_code", "LON(east)": "longitude",
-               "LAT(north)": "latitude", "ALT(m)": "altitude",
-               "NAME": "location_name"}
     
-    stations = (df_stations.rename(columns=col_map)
-                           .to_dict(orient="records"))
+    # Convert Pandas DataFrame into a list of dicts
+    stations = df_stations.to_dict(orient="records")
 
     # Write the parameter data to JSON file in 'metadata' folder
     write_to_json_datafile(sourceurl, stations,

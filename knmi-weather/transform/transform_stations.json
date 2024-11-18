@@ -1,0 +1,7 @@
+{
+    "STN": "station_code",
+    "LON(east)": "longitude",
+    "LAT(north)": "latitude",
+    "ALT(m)": "altitude",
+    "NAME": "location_name"
+}

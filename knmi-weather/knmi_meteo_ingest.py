@@ -1,3 +1,28 @@
+"""KNMI Meteo Ingestion
+
+This script makes use of the KNMI script data retrieval
+service through Python and loads the data to Pandas DataFrames.
+
+This script requires that `pandas` and `requests` be installed within 
+the Python environment you are running this script in.
+
+Furthermore a stable internet connection and the availability of the
+KNMI script data retrieval service are required.
+
+This file can also be imported as a module and contains the following
+functions:
+
+    * load_json_to_df - load metadata JSON to pandas DataFrame (df)
+    * knmi_response_content_to_df - parse KNMI byte-response to df
+    * knmi_load_meteo_stations - load meteo stations as df
+    * knmi_load_daily_parameters - load daily parameters as df
+    * knmi_load_hourly_parameters - load hourly parameters as df
+    * knmi_meteo_to_df - handle KNMI 'get' request, load result to df 
+
+For more info on the KNMI script data retrieval services, please see:
+https://www.knmi.nl/kennis-en-datacentrum/achtergrond/data-ophalen-vanuit-een-script
+"""
+
 import io
 import os
 import json
@@ -21,12 +46,12 @@ def knmi_load_meteo_stations() -> pd.DataFrame:
 
 
 def knmi_load_daily_parameters() -> pd.DataFrame:
-    """Load day param. metadata as pd.DataFrame."""
+    """Load daily parameter metadata as pd.DataFrame."""
     return load_json_to_df("knmi_parameters_daily.json", "parameters")
 
 
 def knmi_load_hourly_parameters() -> pd.DataFrame:
-    """Load hour param. metadata as pd.DataFrame."""
+    """Load hourly parameter metadata as pd.DataFrame."""
     return load_json_to_df("knmi_parameters_hourly.json", "parameters")
 
 
