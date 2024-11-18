@@ -12,7 +12,7 @@ KNMI script data retrieval service are required.
 This file can also be imported as a module and contains the following
 functions:
 
-    * load_json_to_df - load metadata JSON to pandas DataFrame (df)
+    * load_md_json_to_df - load metadata JSON to pandas DataFrame (df)
     * knmi_response_content_to_df - parse KNMI byte-response to df
     * knmi_load_meteo_stations - load meteo stations as df
     * knmi_load_daily_parameters - load daily parameters as df
@@ -30,29 +30,31 @@ import datetime
 import requests
 import pandas as pd
 
+from knmi_mode_validation import validate_mode_get_source
 
-def load_json_to_df(filename: str, datakey: str) -> pd.DataFrame:
+
+def load_md_json_to_df(filename: str, datakey: str) -> pd.DataFrame:
     """Load metadata JSON to pd.DataFrame."""
     with open(os.path.join("metadata", filename)) as f:
         data = json.load(f)
-        df = pd.DataFrame.from_records(data["stations"])
+        df = pd.DataFrame.from_records(data[datakey])
     
     return df
 
 
 def knmi_load_meteo_stations() -> pd.DataFrame:
     """Load meteo station metadata as pd.DataFrame."""
-    return load_json_to_df("knmi_meteo_stations.json", "stations")
+    return load_md_json_to_df("knmi_meteo_stations.json", "stations")
 
 
 def knmi_load_daily_parameters() -> pd.DataFrame:
     """Load daily parameter metadata as pd.DataFrame."""
-    return load_json_to_df("knmi_parameters_daily.json", "parameters")
+    return load_md_json_to_df("knmi_parameters_daily.json", "parameters")
 
 
 def knmi_load_hourly_parameters() -> pd.DataFrame:
     """Load hourly parameter metadata as pd.DataFrame."""
-    return load_json_to_df("knmi_parameters_hourly.json", "parameters")
+    return load_md_json_to_df("knmi_parameters_hourly.json", "parameters")
 
 
 def knmi_response_content_to_df(knmi_response_content: bytes) -> pd.DataFrame:
@@ -125,18 +127,7 @@ def knmi_meteo_to_df(meteo_stns_list: list | None,
 
     """
     # Enforce specification of correct mode
-    valid_modes = ['day', 'daily', 'dag', 'd', 'hour', 'hourly', 'h', 'hr',
-                   'uur', 'u']
-
-    mode_err_msg = f"Please enter a valid 'mode': {', '.join(valid_modes)}"
-    assert mode.lower() in valid_modes, mode_err_msg
-
-    # Get day or hourly data depending on the user's preference
-    if mode.lower() in ['day', 'daily', 'dag', 'd']:
-        meteo_url = "https://www.daggegevens.knmi.nl/klimatologie/daggegevens"
-
-    elif mode.lower() in ['hour', 'hourly', 'h', 'hr', 'uur', 'u']:
-        meteo_url = "https://www.daggegevens.knmi.nl/klimatologie/uurgegevens"
+    meteo_url = validate_mode_get_source(mode)
 
     # Get unique station IDs and define variables for data request
     if meteo_stns_list:

@@ -1,5 +1,24 @@
 
 
+import os
+import json
+
+import pandas as pd
+
+
+
+def load_tf_json(filename: str) -> list[dict] | dict:
+    """Load 'transform' JSON to Python object."""
+    with open(os.path.join("transform", filename)) as f:
+        json_obj = json.load(f)
+    
+    return json_obj
+
+
+def transform_param_values(df: pd.DataFrame) -> pd.DataFrame:
+    """TODO: Create text here."""
+    
+
 # Step 1: Load JSON mapping file
 # TODO: Find parameter code in JSON file ('parameter_code')
 # TODO: Remap colname to 'parameter_name'
