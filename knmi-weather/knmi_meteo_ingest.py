@@ -30,7 +30,7 @@ import datetime
 import requests
 import pandas as pd
 
-from knmi_mode_validation import validate_mode_get_source
+from knmi_mode_validation import validate_mode
 
 
 def load_md_json_to_df(filename: str, datakey: str) -> pd.DataFrame:
@@ -126,8 +126,13 @@ def knmi_meteo_to_df(meteo_stns_list: list | None,
         Pandas DataFrame containing the downloaded meteo data.
 
     """
-    # Enforce specification of correct mode
-    meteo_url = validate_mode_get_source(mode)
+    # Enforce specification of correct mode, get corresponding URL
+    mode = validate_mode(mode)
+
+    if mode == "daily":
+        meteo_url = "https://www.daggegevens.knmi.nl/klimatologie/daggegevens"
+    elif mode == "hourly":
+        meteo_url = "https://www.daggegevens.knmi.nl/klimatologie/uurgegevens"
 
     # Get unique station IDs and define variables for data request
     if meteo_stns_list:
