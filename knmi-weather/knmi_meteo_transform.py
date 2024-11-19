@@ -1,6 +1,7 @@
 """KNMI Meteo Transformation
 
-This script makes use of TODO:
+This script contains the general transformation functions for
+the 'raw' / ingested data returned by the KNMI web service.
 
 This script requires that `pandas` and `numpy` be installed within 
 the Python environment you are running this script in.
@@ -8,7 +9,9 @@ the Python environment you are running this script in.
 This file can also be imported as a module and contains the following
 functions:
 
-    * TODO: FILL FUNCTIONS
+    * load_tf_json - load 'transform' JSON to Python object
+    * transform_stations - transform raw station data to cleaned df
+    * transform_param_values - transform raw values to cleaned df
 
 """
 
@@ -17,8 +20,6 @@ import json
 
 import pandas as pd
 import numpy as np
-
-from knmi_mode_validation import validate_mode
 
 
 def load_tf_json(filename: str) -> list[dict] | dict:
@@ -29,18 +30,62 @@ def load_tf_json(filename: str) -> list[dict] | dict:
     return json_obj
 
 
-def transform_param_values(df: pd.DataFrame, mode="day",
+def transform_stations(df_stn: pd.DataFrame) -> pd.DataFrame:
+    """
+    Transform raw station data to a cleaned Pandas DataFrame.
+
+    Prettifies the column names of the stations DataFrame.
+
+    Parameters
+    ----------
+    df_stn : pd.DataFrame
+        DataFrame with raw station (column name) data.
+
+    Returns
+    -------
+    pd.DataFrame
+        Cleaned station (column name) DataFrame.
+
+    """
+    # Load JSON file with transformation mapping as list of dict items
+    stn_tf_map = load_tf_json("transform_stations.json")
+
+    return df_stn.rename(columns=stn_tf_map)
+
+
+def transform_param_values(df: pd.DataFrame,
                            nullify_small_sumvals=False) -> pd.DataFrame:
-    """TODO: Create text here."""
+    """
+    Transform raw values to a cleaned Pandas DataFrame.
 
+    In this function various general data cleaning steps are performed. 
+    The column names are prettified, and the values are converted to whole
+    units where possible.
+
+    For parameters that can be summed, all negative values are
+    converted to NaNs, nullified, or replaced by small values
+    (the latter two only in case of -1).
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        DataFrame with raw values and one param per col.
+    nullify_small_values : bool
+        Specify whether to convert small summable values to the
+        average of its category (0.025), or to nullify them.
+
+    Returns
+    -------
+    pd.DataFrame
+        Cleaned DataFrame with parameter cols and values.
+    """
     # Validate mode for correct filename link
-    mode = validate_mode(mode)
-
-    if mode == "daily":
+    if "HH" not in df.columns:
+        mode = "daily"
         param_filename = "transform_params_day.json"
-    elif mode == "hourly":
+    else:
+        mode = "hourly"
         param_filename = "transform_params_hour.json"
-        raise NotImplementedError("Configure 'transform_params_hour.json' before proceeding.")
 
     # Load JSON file with transformation mapping as list of dict items
     param_tf_map = load_tf_json(param_filename)
@@ -54,7 +99,7 @@ def transform_param_values(df: pd.DataFrame, mode="day",
         map_item = next((d for d in param_tf_map
                          if d["parameter_code"] == colname), None)
         
-        # Give warning, skip this col if no linked item found
+        # Give warning and skip this col if no linked item found
         if not map_item:
             if colname not in ["STN", "YYYYMMDD", "HH"]:
                 print(f"Warning: no transform dict item found for colname "
@@ -83,13 +128,22 @@ def transform_param_values(df: pd.DataFrame, mode="day",
     # Reformat STN, YYYYMMDD and possible HH columns
     df.rename(columns={"STN": "station_code", "YYYYMMDD": "date",
                        "HH": "hour"}, inplace=True)
-    # Update all columns with prettified names in one go
+    
+    # Create date or datetime col with time
+    if mode == "daily":
+        df["date"] = (pd.to_datetime(df["date"], format="%Y%m%d").dt.date)
+
+    elif mode == "hourly":
+        # Ensure that hours always fill up two characters
+        df["hour_filled"] = (df["hour"].astype(int) - 1).astype(str).str.zfill(2)
+        df["datetime"] = (pd.to_datetime(
+                            df[["date", "hour_filled"]]
+                            .astype(str).sum(axis=1),
+                            format="%Y%m%d%H"))
+
+        df.drop(columns=['hour_filled'], inplace=True)
+
+    # Update all other cols with prettified names in one go
     df.rename(columns=rename_cols, inplace=True)
 
     return df
-
-
-# TODO: Update stations transform to be part of this script, using 'transform_stations.json' as colmapper
-    #stations = (df_stations.rename(columns=col_map)
-    #                       .to_dict(orient="records"))
-

@@ -76,10 +76,23 @@ def knmi_response_content_to_df(knmi_response_content: bytes) -> pd.DataFrame:
     with io.StringIO() as string_buffer:
         string_buffer.write(knmi_response_content.decode("utf-8"))
 
-        # Go to the start of the in-memory file;
+        # Go to the start of the in-memory file
         string_buffer.seek(0)
 
-        # STN and YYYYMMDD are always returned, so provides a good cut-off
+        # The string buffer should not start with HTML declaration
+        first_line = string_buffer.readline()
+        
+        if 'DOCTYPE html' in first_line:
+            # string_buffer.truncate(0)
+            raise AssertionError("KNMI service returned HTML instead of data - "
+                                 "request less data. If that does not help, "
+                                 "check whether the service is available "
+                                 "at this moment.")
+
+        # If all OK, return to the start of the in-memory file
+        string_buffer.seek(0)
+
+        # STN and YYYYMMDD are always returned as data: provides good cut-off
         split_text = "# STN,YYYYMMDD"
 
         # Only keep string portion after cutoff, replace first '#'
@@ -95,6 +108,10 @@ def knmi_response_content_to_df(knmi_response_content: bytes) -> pd.DataFrame:
         df_data = pd.read_csv(string_buffer, sep=r"\s*,\s*", engine="python",
                               index_col=False, on_bad_lines='skip',
                               encoding='utf-8')
+        
+    # Remove any possible double-entry columns
+    df_data.drop(df_data.columns[df_data.columns.str.endswith('.1')],
+                 axis=1, inplace=True)
 
     return df_data
 
@@ -118,7 +135,7 @@ def knmi_meteo_to_df(meteo_stns_list: list | None,
     end_date : date or datetime
         Last day for which data should be downloaded.
     mode : str
-        Specify whether to load daily or hour-based values.
+        Specify whether to load day- or hour-based values.
 
     Returns
     -------
@@ -157,7 +174,10 @@ def knmi_meteo_to_df(meteo_stns_list: list | None,
     # Send the POST request including all specifications
     response = requests.post(meteo_url, data=post_data)
 
-    # Transform the content of the KNMI response to a DataFrame and return it
+    # Raise error if something went wrong with the request
+    response.raise_for_status()
+
+    # Parse the KNMI response content and return it
     df_meteo = knmi_response_content_to_df(response.content)
 
     return df_meteo

@@ -146,7 +146,7 @@
     {
       "parameter_code": "Q",
       "parameter_desc": "Globale straling (in J/cm2)",
-      "parameter_name": "global_irradiation",
+      "parameter_name": "global_irradiance",
       "parameter_unit": "J/cm2",
       "parameter_mult": 1,
       "is_summable": true

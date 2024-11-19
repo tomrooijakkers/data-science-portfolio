@@ -155,7 +155,7 @@ def knmi_station_content_to_df(knmi_response_content: bytes) -> pd.DataFrame:
 def knmi_update_meteo_station_metadata(sourceurl: str, 
                                        datafile: str) -> None:
     """Update KNMI automatic meteo station metadata."""
-    # Set start, end dates in future, to only return metadata
+    # Set start, end dates in future - to only return metadata
     start_date = datetime.date.today() + datetime.timedelta(days=1)
     end_date = datetime.date.today() + datetime.timedelta(days=2)
 
@@ -168,6 +168,9 @@ def knmi_update_meteo_station_metadata(sourceurl: str,
 
     # Send the POST request including all specifications
     response = requests.post(sourceurl, data=post_data)
+
+    # Raise error if something went wrong with the request
+    response.raise_for_status()
 
     # Transform the content of the KNMI response to a DataFrame
     df_stations = knmi_station_content_to_df(response.content)
