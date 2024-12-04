@@ -234,6 +234,7 @@ def viz(df_h_slot_pcs, title_text, subtitle_text,
 
 
 def knmi_hourslot_percentage_df(start_date: datetime.date, end_date: datetime.date,
+                                in_season: bool = False,
                                 param_col: str = "max_rain_hour_sum",
                                 hourslot_col: str = "hour_slot_max_rain_hour_sum",
                                 param_min_cutoff_val: float = 0.1,
@@ -256,6 +257,11 @@ def knmi_hourslot_percentage_df(start_date: datetime.date, end_date: datetime.da
         The start date for the data range to fetch from KNMI.
     end_date : datetime.date
         The end date for the data range to fetch from KNMI.
+    in_season : bool, optional
+        Set to True to only load data between `start_date` and 
+        `end_date` for each year in the selection. If False,
+        all days and/or hours in the range between `start_date`
+        and `end_date` are selected (default behavior).
     param_col : str, optional
         The name of the column representing the meteorological 
         parameter to analyze. Default is "max_rain_hour_sum".
@@ -282,14 +288,30 @@ def knmi_hourslot_percentage_df(start_date: datetime.date, end_date: datetime.da
     -----
     - The resulting DataFrame contains only stations with fewer than 
     the specified fraction of missing values.
+    - Only works for daily KNMI data, as the hour slot-based data
+    summaries are only directly available in 'daily' mode.
     - The output percentages are normalized per station, based on
     total occurrences.
     """
+    # Translate parameter names back to parameter codes for request
+    par_dct = knmi_meteo_transform.load_tf_json("transform_params_day.json")
+
+    # Find linked parameter codes on key 'parameter_name'
+    param_codes = []
+    for col in [param_col, hourslot_col]:
+        par_item = next((d for d in par_dct
+                         if d["parameter_name"] == col), None)
+        
+        param_codes.append(par_item["parameter_code"])
+
+    print("Param codes: ", param_codes)
+
     # Get dataset from KNMI web script service
     df_day = knmi_meteo_ingest.knmi_meteo_to_df(meteo_stns_list=None,
-                                            meteo_params_list=None,
+                                            meteo_params_list=param_codes,
                                             start_date=start_date,
-                                            end_date=end_date)
+                                            end_date=end_date,
+                                            in_season=in_season)
     
     # Apply transformations to the raw dataset
     df_day_cleaned = knmi_meteo_transform.transform_param_values(df_day)

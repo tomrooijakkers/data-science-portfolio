@@ -120,7 +120,8 @@ def knmi_meteo_to_df(meteo_stns_list: list | None,
                      meteo_params_list: list[str] | None,
                      start_date: datetime.date | datetime.datetime,
                      end_date: datetime.date | datetime.datetime,
-                     mode: str = 'day') -> pd.DataFrame:
+                     mode: str = 'day',
+                     in_season: bool = False) -> pd.DataFrame:
     """
     Convert day/hr KNMI automatic meteo station data to pd.DataFrame.
 
@@ -134,8 +135,13 @@ def knmi_meteo_to_df(meteo_stns_list: list | None,
         First day for which data should be downloaded.
     end_date : date or datetime
         Last day for which data should be downloaded.
-    mode : str
+    mode : str, optional
         Specify whether to load day- or hour-based values.
+    in_season : bool, optional
+        Set to True to only load data between `start_date` and 
+        `end_date` for each year in the selection. If False,
+        all days and/or hours in the range between `start_date`
+        and `end_date` are selected (default behavior).
 
     Returns
     -------
@@ -170,6 +176,10 @@ def knmi_meteo_to_df(meteo_stns_list: list | None,
                  "start": start_date.strftime('%Y%m%d'),
                  "end": end_date.strftime('%Y%m%d'),
                  "fmt": "csv"}
+    
+    # Add 'inseason' parameter if in_season is True
+    if in_season:
+        post_data["inseason"] = "Y"
 
     # Send the POST request including all specifications
     response = requests.post(meteo_url, data=post_data)
