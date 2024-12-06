@@ -2,7 +2,7 @@ import datetime
 import pandas as pd
 import matplotlib.pyplot as plt
 
-from functools import partial
+from functools import partial, reduce
 from matplotlib import colors as cl
 from matplotlib import colormaps as cm
 
@@ -69,11 +69,6 @@ def blend_colormaps_cyclically(n_cats: int, cmap_name_a: str,
     first half of the categories, and colors from the inverted(!)
     second colormap are used for the second half.
 
-    For the best result it is advised to choose the two colormaps in such
-    a way that the color of the end of colormap A is very similar to the
-    color of the end of colormap B. Also set c_min around 0.15 and c_max
-    around 0.85, as this filters out the extreme ends of each colormap.
-
     Parameters
     ----------
     n_cats : int
@@ -98,6 +93,11 @@ def blend_colormaps_cyclically(n_cats: int, cmap_name_a: str,
     - The `centered_symmetric_linear` function is used to compute the 
       normalized value for each category, ensuring symmetry and smooth
       transitions.
+    - For the best result it is advised to choose the two colormaps in such
+      a way that the color of the end of colormap A is very similar to the
+      color of the end of colormap B.
+    - Also set c_min around 0.15 and c_max around 0.85, as this filters out 
+      the extreme ends of each colormap.
 
     Examples
     --------
@@ -126,26 +126,55 @@ def blend_colormaps_cyclically(n_cats: int, cmap_name_a: str,
     return colors
 
 
-def viz(df_h_slot_pcs, title_text, subtitle_text,
-        cmap_name_a="inferno", cmap_name_b="inferno",
-        c_max=0.85, c_min=0.125) -> plt.Axes:
-    """"""
+def cyclic_hourslot_boxplot(df_h_slot: pd.DataFrame,
+                            title_text: str,
+                            subtitle_text: str = "", 
+                            cmap_name_a: str = "inferno", 
+                            cmap_name_b: str = "inferno",
+                            c_max: float = 0.85,
+                            c_min: float = 0.125) -> plt.Axes:
     """
-    Created custom function below to allow for many more
-    options for creating cyclic-style colormaps.
+    Create hourslot boxplot of KNMI data using two colormap(s).
 
-    You can choose any colormap of your liking.
+    Traverses through the first colormap (a) in linear order
+    and through the second colormap (b) in reverse linear order.
+    The edges of each colormap are set by `c_min` and `c_max`. 
 
-    Make sure the midpoints of your first and second cmaps
-    look alike (or choose them to be the same as in here),
-    so that you end up with a cyclic colormap in any case.
+    Parameters
+    ----------
+    df_h_slot : pd.DataFrame
+        DataFrame with stations as index and hourslots as cols.
+    title_text : str
+        The text to display on the main title of the figure.
+    subtitle_text : str, optional
+        The text to display below the main title of the figure.
+    cmap_name_a : str
+        The name of the colormap for the first half of data.
+    cmap_name_b : str
+        The colormap name for the second half of the data; this
+        colormap will be traversed through in reverse order.
+    c_max : float
+        Maximum (normalized) color value to pick a color from
+        the colormap from. Set this around 0.85 to prevent
+        the display of 'extreme' colors from the colormaps.
+    c_min : float
+        Maximum (normalized) color value to pick a color from
+        the colormap from. Set this around 0.15 to prevent
+        the display of 'extreme' colors from the colormaps.
+
+    Notes
+    -----
+    - The colormap should be available via Matplotlib's `cm.get_cmap` function.
+    - For the best result it is advised to choose the two colormaps in such
+      a way that the color at the end of colormap (a) is very similar to the
+      color at the end of colormap (b).
     """  
     # Define custom styles for plot text and ticks
     textfont = {"fontname": "Palatino"}
     tickfont = {"fontname": "Georgia"}
 
     # Create boxplot with Pandas & Matplotlib
-    ax, bp = df_h_slot_pcs.T.plot(
+    ax, bp = df_h_slot.plot(
         # Create a boxplot
         kind="box",
         # Make markers for the means
@@ -163,7 +192,7 @@ def viz(df_h_slot_pcs, title_text, subtitle_text,
                        markerfacecolor='w',
                        markersize=2),
         # Properties for median lines
-        medianprops=dict(linestyle='-.', 
+        medianprops=dict(linestyle='-', 
                          color='w',
                          linewidth=1),
         # Properties for IQR whisker lines
@@ -214,12 +243,12 @@ def viz(df_h_slot_pcs, title_text, subtitle_text,
 
     # Get central x-pos; max y-pos as title plotting locations
     x_mid = sum(ax.get_xlim()) / len(ax.get_xlim())
-    y_max = ax.get_ylim()[-1]
+    y_max = ax.get_yticks()[-1]
 
     # Add title and subtitles as text on the Axes object
-    ax.text(x_mid, 1.2*y_max, title_text, fontsize=14,
+    ax.text(x_mid, 1.11*y_max, title_text, fontsize=14,
             ha='center', va='top', **textfont)
-    ax.text(x_mid, 1.11*y_max, subtitle_text, fontsize=9,
+    ax.text(x_mid, 1.0375*y_max, subtitle_text, fontsize=9,
             ha='center', va='top', **textfont)
 
     # Customize font of the tick markers
@@ -228,6 +257,9 @@ def viz(df_h_slot_pcs, title_text, subtitle_text,
 
     # Customize the grid layout
     ax.grid(True, color="grey", linewidth=0.15, linestyle="-")
+
+    # Cut off any potential negative y-values (should not occur)
+    ax.set_ylim(0)
 
     # Return the Axes object for plotting
     return ax
@@ -238,7 +270,8 @@ def knmi_hourslot_percentage_df(start_date: datetime.date, end_date: datetime.da
                                 param_col: str = "max_rain_hour_sum",
                                 hourslot_col: str = "hour_slot_max_rain_hour_sum",
                                 param_min_cutoff_val: float = 0.1,
-                                max_station_na_frac: float =0.1) -> pd.DataFrame:
+                                max_station_na_frac: float = 0.1,
+                                return_as_counts: bool = False) -> pd.DataFrame:
     """
     Convert KNMI data to hour slot occurrences as percentages.
 
@@ -276,6 +309,9 @@ def knmi_hourslot_percentage_df(start_date: datetime.date, end_date: datetime.da
         The maximum allowed fraction of missing data per station. Stations
         with a higher fraction of missing values will be excluded.
         Default is 0.1.
+    return_as_counts : bool, optional
+        Indicate whether to keep the DataFrame as overview of counts.
+        Default is False (meaning percentages will be returned).
 
     Returns
     -------
@@ -296,22 +332,20 @@ def knmi_hourslot_percentage_df(start_date: datetime.date, end_date: datetime.da
     # Translate parameter names back to parameter codes for request
     par_dct = knmi_meteo_transform.load_tf_json("transform_params_day.json")
 
-    # Find linked parameter codes on key 'parameter_name'
+    # Use key 'parameter_name' to find associated parameter codes
     param_codes = []
     for col in [param_col, hourslot_col]:
         par_item = next((d for d in par_dct
                          if d["parameter_name"] == col), None)
-        
-        param_codes.append(par_item["parameter_code"])
 
-    print("Param codes: ", param_codes)
+        param_codes.append(par_item["parameter_code"])
 
     # Get dataset from KNMI web script service
     df_day = knmi_meteo_ingest.knmi_meteo_to_df(meteo_stns_list=None,
-                                            meteo_params_list=param_codes,
-                                            start_date=start_date,
-                                            end_date=end_date,
-                                            in_season=in_season)
+                                                meteo_params_list=param_codes,
+                                                start_date=start_date,
+                                                end_date=end_date,
+                                                in_season=in_season)
     
     # Apply transformations to the raw dataset
     df_day_cleaned = knmi_meteo_transform.transform_param_values(df_day)
@@ -324,8 +358,8 @@ def knmi_hourslot_percentage_df(start_date: datetime.date, end_date: datetime.da
     is_cutoff = df_h[param_col] < param_min_cutoff_val
     df_h.loc[is_cutoff, hourslot_col] = -1
     
-    # Remove parameter column; not needed further
-    df_h.drop(columns=[param_col], inplace=True)
+    # Remove parameter column (not needed further)
+    df_h = df_h.copy().drop(columns=[param_col])
 
     # Pivot data with 'date' as index, 'stn_code' as cols
     df_h_pivot = (df_h.pivot(index="date",
@@ -334,7 +368,7 @@ def knmi_hourslot_percentage_df(start_date: datetime.date, end_date: datetime.da
     # Flatten pivot table to single index
     df_h_pivot.columns = (df_h_pivot.columns
                           .get_level_values(1))
-    
+
     # Only keep stations with less than fraction of values missing
     keep_cols = [col for col in df_h_pivot.columns 
                  if (df_h_pivot[col].isna().sum() 
@@ -345,33 +379,60 @@ def knmi_hourslot_percentage_df(start_date: datetime.date, end_date: datetime.da
     df_h_pivot = df_h_pivot[keep_cols]
 
     # Create DataFrame for storing counts / occurrences
-    df_h_counts = pd.DataFrame()
+    hr_idxs = [-1] + list(range(1, 25))
+    df_h_counts = pd.DataFrame(index=hr_idxs)
 
     # Build up the 'counts' DataFrame col by col
     for col in df_h_pivot.columns:
         df_h_counts[col] = (df_h_pivot[col]
                             .value_counts())
 
-    # Order the hour slots in index; ascending
-    df_h_counts.sort_index(ascending=True,
-                           inplace=True)
+    # Drop cutoff observations (-1) from the dataset (if any)
+    cutoff_idx = -1
 
-    # Rename index
-    df_h_counts.index.names = ['hour_slot']
-
-    # Drop cutoff observations (-1) from the dataset
-    cutoff_idxs = [-1.0]
-
-    df_h_counts.drop(cutoff_idxs, axis='index',
+    if cutoff_idx in df_h_counts.index.values:
+        df_h_counts.drop(cutoff_idx, axis='index',
                          inplace=True)
     
-    # Normalize data by total counts per column
-    df_h_slot_pcs = df_h_counts.apply(lambda x: 100 * x / x.sum())
+    # Do not convert to percentages if 'return_as_counts'
+    if return_as_counts:
+        df_h_slots = df_h_counts.copy()
+    
+    # Else, normalize data by total counts per column
+    else:
+        df_h_slots = df_h_counts.apply(lambda x: 100 * x / x.sum())
 
     # Simplify / prettify index columns
-    df_h_slot_pcs.index = (df_h_slot_pcs.index
-                                        .astype(int)
-                                        .astype(str))
+    df_h_slots.index = (df_h_slots.index
+                                  .astype(int)
+                                  .astype(str))
+    
+    # Fill missing values using 0, since that means that 
+    # an hourslot did not occur in given period @ station
+    df_h_slots = df_h_slots.copy().fillna(0)
     
     # Switch index and cols and return the overview
-    return df_h_slot_pcs.T
+    return df_h_slots.T
+
+
+def get_multiyr_hourslot_percentages(year_start, year_end, **kwargs):
+    """ """
+
+    # TODO: WRITE DOCUMENTATION FOR THIS FUNCTION
+
+    # Fetch KNMI data year by year to prevent service overflow
+    df_h_list = []
+    for yr in range(year_start, year_end+1):
+        df_h_year = knmi_hourslot_percentage_df(start_date=datetime.date(yr, 1, 1), 
+                                                end_date=datetime.date(yr, 12, 31),
+                                                return_as_counts=True,
+                                                **kwargs)
+        df_h_list.append(df_h_year)
+
+    # Use a reduce function to sum all count-dfs from the result list at once
+    df_h_counts = reduce(lambda x, y: x.add(y, fill_value=0), df_h_list)
+
+    # Convert the summed counts to percentages (apply over columns)
+    df_h_slots = df_h_counts.apply(lambda x: 100 * x / x.sum(), axis=1)
+
+    return df_h_slots
