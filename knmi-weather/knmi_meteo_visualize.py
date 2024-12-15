@@ -4,8 +4,9 @@ This script contains the data visualization functions for the data
 returned by the KNMI web service which has been transformed in 
 script `knmi_meteo_transform.py`.
 
-This script requires that `pandas` and `matplotlib` be installed within
-the Python environment you are running this script in.
+This script requires that `numpy`, `pandas`, `matplotlib`, `pykrige` 
+and `basemap` be installed within the Python environment you 
+are running this script in.
 
 This file can also be imported as a module and contains the following
 functions:
@@ -15,6 +16,7 @@ functions:
     * cyclic_hourslot_boxplot - create KNMI cyclic-cmap h-slot boxplot of data
 """
 
+import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
@@ -22,6 +24,8 @@ from functools import partial
 
 from matplotlib import colors as cl
 from matplotlib import colormaps as cm
+from pykrige.ok import OrdinaryKriging
+from mpl_toolkits.basemap import Basemap
 
 
 def centered_symmetric_linear(N: float, N_max: float,
@@ -178,7 +182,7 @@ def cyclic_hourslot_boxplot(df_h_slot: pd.DataFrame,
 
     Notes
     -----
-    - The colormap should be available via Matplotlib's `cm.get_cmap` function.
+    - The colormap should be available via Matplotlib function `cm.get_cmap`.
     - For the best result it is advised to choose the two colormaps in such
       a way that the color at the end of colormap (a) is very similar to the
       color at the end of colormap (b).
@@ -250,11 +254,6 @@ def cyclic_hourslot_boxplot(df_h_slot: pd.DataFrame,
     ax.set_xlabel("Hour slot (1= 0-1 UT; 2= 1-2 UT, ...)", **textfont)
     ax.set_ylabel("Occurrence (in %)", **textfont)
 
-    # Set title and subtitle text and styles
-    #title_text = f"Hour slots with maximum daily rainfall - Dutch KNMI stations ({YEAR})"
-    #subttl_text = ("Means: circles, medians: lines, uniform reference: dashdot line,"
-    #               " outliers (non-IQR): crosses")
-
     # Get central x-pos; max y-pos as title plotting locations
     x_mid = sum(ax.get_xlim()) / len(ax.get_xlim())
     y_max = ax.get_yticks()[-1]
@@ -276,4 +275,84 @@ def cyclic_hourslot_boxplot(df_h_slot: pd.DataFrame,
     ax.set_ylim(0)
 
     # Return the Axes object for plotting
+    return ax
+
+
+def ordinary_kriging_nl_plot(locs_x, locs_y, values,
+                             variogram_model : str = "linear",
+                             cmap : str = "YlOrRd",
+                             grid_dim_xy : int = 500,
+                             map_resolution : str = "h",
+                             plot_title : str = "<Plot title>",
+                             val_label : str = "<Value label>",
+                             loc_color : str = "k",
+                             loc_marker : str = "o",
+                             loc_msize : int = 8
+                             ):
+    """"""
+    # Define custom styles for plot text and ticks
+    textfont = {"fontname": "Palatino"}
+    tickfont = {"fontname": "Georgia",
+                "size": 12}
+
+     # Set up Axes for plotting
+    ax = plt.gca()
+
+    # Create grid around NL for geospatial interpolation
+    min_x, max_x = 3.0, 8.0
+    min_y, max_y = 50.0, 54.0
+
+    grid_x, grid_y = np.meshgrid(np.linspace(min_x, max_x, grid_dim_xy, 
+                                             endpoint=True), 
+                                 np.linspace(min_y, max_y, grid_dim_xy, 
+                                             endpoint=True))
+
+    # Set up OrdinaryKriging (2D-based) to populate grid with values
+    OK = OrdinaryKriging(locs_x, locs_y, values,
+                         variogram_model=variogram_model,
+                         verbose=False, enable_plotting=False,
+                         coordinates_type="geographic")
+
+    # Execute Ord. Kriging algorithm to fill grid with interpolated values
+    # (Note: the variance grid output is not used here; hence the '_')
+    grid_z, _ = OK.execute("grid", grid_x[0, :], grid_y[:, 0])
+
+    # Create a Basemap for The Netherlands & surrounding area
+    m = Basemap(projection='merc', llcrnrlat=50.7, urcrnrlat=53.7, 
+                llcrnrlon=3.3, urcrnrlon=7.3, resolution=map_resolution,
+                ax=ax)
+    
+    # Add country borders, rivers and coastlines
+    m.drawcountries(linewidth=0.5, linestyle='-.', color='k')
+    m.drawrivers(linewidth=0.3, linestyle='solid', color='darkblue')
+    m.drawcoastlines(linewidth=0.5, linestyle='solid', color='k')
+
+    # Convert grid coordinates to map projection coordinates
+    x, y = m(grid_x, grid_y)
+
+    # Mask values outside land borders using the Basemap land-sea mask
+    land_mask = np.vectorize(m.is_land)(x, y)
+    land_grid_z = np.ma.masked_where(np.logical_not(land_mask), grid_z)
+
+    # Plot interpolated values on the land parts of the map
+    cs = m.contourf(x, y, land_grid_z, cmap=cmap)
+
+    # Add color bar
+    cbar = m.colorbar(cs, location='right', pad="10%")
+    cbar.set_label(val_label, fontsize=14,  **textfont)
+
+    # Add location markers to map plot as well
+    locs_mx, locs_my = m(locs_x, locs_y)
+    m.scatter(locs_mx, locs_my, color=loc_color, marker=loc_marker,
+              s=loc_msize, ax=ax)
+ 
+    # Customize font of the colorbar's tick markers
+    cbar.ax.set_yticks(cbar.ax.get_yticks(), cbar.ax.get_yticklabels(), 
+                       **tickfont)
+    cbar.ax.set_xticks(cbar.ax.get_xticks(), cbar.ax.get_xticklabels(), 
+                       **tickfont)
+    
+    # Add the title and return the final Axes object for plotting
+    plt.title(plot_title, fontsize=18, **textfont)
+    
     return ax
