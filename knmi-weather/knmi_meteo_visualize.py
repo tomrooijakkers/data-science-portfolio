@@ -5,8 +5,8 @@ returned by the KNMI web service which has been transformed in
 script `knmi_meteo_transform.py`.
 
 This script requires that `numpy`, `pandas`, `matplotlib`, `pykrige` 
-and `basemap` be installed within the Python environment you 
-are running this script in.
+and `basemap` be installed within the Python environment you are running
+this script in.
 
 This file can also be imported as a module and contains the following
 functions:
@@ -14,6 +14,8 @@ functions:
     * centered_symmetric_linear - symm. lin-func. with peak at N_max/2
     * blend_colormaps_cyclically - mix two cmaps to get cyclic hex color codes
     * cyclic_hourslot_boxplot - create KNMI cyclic-cmap h-slot boxplot of data
+    * ordinary_kriging_nl_plot - create interpolation plot over The Netherlands
+
 """
 
 import numpy as np
@@ -156,7 +158,7 @@ def cyclic_hourslot_boxplot(df_h_slot: pd.DataFrame,
 
     Traverses through the first colormap (a) in linear order
     and through the second colormap (b) in reverse linear order.
-    The edges of each colormap are set by `c_min` and `c_max`. 
+    The color range edges of each colormap are set by `c_min` and `c_max`.
 
     Parameters
     ----------
@@ -287,9 +289,62 @@ def ordinary_kriging_nl_plot(locs_x, locs_y, values,
                              val_label : str = "<Value label>",
                              loc_color : str = "k",
                              loc_marker : str = "o",
-                             loc_msize : int = 8
-                             ):
-    """"""
+                             loc_msize : int = 8) -> plt.Axes:
+    """
+    Create a Kriging-based geospatial interpolation plot for The Netherlands.
+
+    This function uses Ordinary Kriging to interpolate values based on
+    geospatial data and visualizes the results on a map of The Netherlands.
+    
+    Customizable options for variogram modeling, colormap, grid
+    resolution, and map appearance are included.
+
+    Parameters
+    ----------
+    locs_x : array-like
+        Longitudes of the input data points.
+    locs_y : array-like
+        Latitudes of the input data points.
+    values : array-like
+        Values associated with the input data points to be interpolated.
+    variogram_model : str, optional
+        The variogram model to use for Kriging interpolation.
+        Default is "linear". See the PyKrige documentation for all options.
+    cmap : str, optional
+        The Matplotlib colormap to use for visualizing interpolated values.
+        Default is "YlOrRd". See Matplotlib docs for all options.
+    grid_dim_xy : int, optional
+        The resolution of the interpolation grid (number of cells
+        along each axis). Default is 500. Reduce to speed up calculation.
+    map_resolution : str, optional
+        The resolution of the map. Options include "c" (crude), "l" (low),
+        "i" (intermediate), "h" (high), "f" (full). Default is "h".
+    plot_title : str, optional
+        Title text for the plot. Default is "<Plot title>".
+    val_label : str, optional
+        Label for the color bar to indicate the value that is visualized.
+        Default is "<Value label>".
+    loc_color : str, optional
+        Color of the markers for input data locations. Default is "k" (black).
+    loc_marker : str, optional
+        Marker style for input data locations. Default is "o" (circle).
+    loc_msize : int, optional
+        Marker size for input data locations. Default is 8.
+
+    Returns
+    -------
+    plt.Axes
+        The matplotlib Axes object containing the interpolated plot.
+
+    Notes
+    -----
+    - The function masks interpolated values outside the land boundaries
+      of The Netherlands using a Basemap land-sea mask.
+    - Any values outside of The Netherlands should be treated with
+      caution, since those are often solely based on the edge locations.
+    - The variogram model of choice depends highly on the data to plot.
+      Try to vary between models if the spatial outcome does not make sense.
+    """
     # Define custom styles for plot text and ticks
     textfont = {"fontname": "Palatino"}
     tickfont = {"fontname": "Georgia",
