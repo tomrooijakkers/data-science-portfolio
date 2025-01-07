@@ -59,7 +59,7 @@ def transform_stations(df_stn: pd.DataFrame) -> pd.DataFrame:
     return df_stn.rename(columns=stn_tf_map)
 
 
-def transform_param_values(df: pd.DataFrame,
+def transform_param_values(df_raw: pd.DataFrame,
                            nullify_small_sumvals=False) -> pd.DataFrame:
     """
     Transform raw values to a cleaned Pandas DataFrame.
@@ -74,7 +74,7 @@ def transform_param_values(df: pd.DataFrame,
 
     Parameters
     ----------
-    df : pd.DataFrame
+    df_raw : pd.DataFrame
         DataFrame with raw values and one param per col.
     nullify_small_values : bool
         Specify whether to convert small summable values to the
@@ -86,7 +86,7 @@ def transform_param_values(df: pd.DataFrame,
         Cleaned DataFrame with parameter cols and values.
     """
     # Validate mode for correct filename link
-    if "HH" not in df.columns:
+    if "HH" not in df_raw.columns:
         mode = "daily"
         param_filename = "transform_params_day.json"
     else:
@@ -98,6 +98,9 @@ def transform_param_values(df: pd.DataFrame,
 
     # Placeholder for column renaming mapper
     rename_cols = {}
+
+    # Placeholder for target DataFrame (to keep input 'df_raw' unchanged)
+    df = df_raw.copy()
 
     for colname in df:
  
