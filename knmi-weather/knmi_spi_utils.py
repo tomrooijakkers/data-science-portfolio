@@ -73,7 +73,7 @@ def param_code_from_col(param_col: str) -> str:
     param_dct = knmi_meteo_transform.load_tf_json("transform_params_day.json")
 
     # Use key 'parameter_name' to find associated parameter codes
-    param_code = next((d for d in param_dct if
+    param_code = next((d["parameter_code"] for d in param_dct if
                        d["parameter_name"] == param_col), None)
 
     # Raise AssertionError if no matching parameter_code was found
@@ -94,39 +94,39 @@ def get_measured_stn_precip_values(stn_code: int,
     param_code = param_code_from_col(param_col)
 
     # Get daily data from KNMI web script service
-    df_rainlist_y = []
+    df_list_y = []
 
     # Split the request in individual years to prevent service overflow
     for year in range(start_year, end_year+1):
-        df_rain_y = (knmi_meteo_ingest
+        df_y = (knmi_meteo_ingest
                      .knmi_meteo_to_df(meteo_stns_list=[stn_code],
                                        meteo_params_list=[param_code],
                                        start_date=datetime.date(year, 1, 1),
                                        end_date=datetime.date(year, 12, 31),
                                        mode="day"))
     
-        df_rainlist_y.append(df_rain_y)
+        df_list_y.append(df_y)
 
     # Concatenate each non-empty yearly series to full history
     # Note: 'ignore_index' used to deduplicate indexes from yearly DataFrames
-    df_rain_raw = pd.concat([df for df in df_rainlist_y if not df.empty],
-                            ignore_index=True)
+    df_raw = pd.concat([df for df in df_list_y if not df.empty],
+                       ignore_index=True)
     
     # Apply transformations to clean the raw dataset
-    df_rain = knmi_meteo_transform.transform_param_values(df_rain_raw)
+    df_clean = knmi_meteo_transform.transform_param_values(df_raw)
 
     # Cut off leading and trailing NaNs from history dataset;
     # in this way we get our actual historical start and end dates
-    min_idx = (df_rain[[param_col]]
+    min_idx = (df_clean[[param_col]]
                .apply(pd.Series.first_valid_index).max())
-    max_idx = (df_rain[[param_col]]
+    max_idx = (df_clean[[param_col]]
                .apply(pd.Series.last_valid_index).min())
-    df_rain = df_rain.loc[min_idx: max_idx, :]
+    df_clean = df_clean.loc[min_idx: max_idx, :]
 
     # Now, re-index DataFrame so that it:
     # 1. Always starts at first day of the first month found
-    first_date = df_rain["date"].iloc[0]
-    last_date = df_rain["date"].iloc[-1]
+    first_date = df_clean["date"].iloc[0]
+    last_date = df_clean["date"].iloc[-1]
     target_first_date = datetime.date(year=first_date.year, 
                                       month=first_date.month, 
                                       day=1)
@@ -142,34 +142,34 @@ def get_measured_stn_precip_values(stn_code: int,
                                      target_last_date, freq="D")
 
     # Set range of collected non-NaN dates as initial index
-    df_rain.index = pd.to_datetime(df_rain["date"])
+    df_clean.index = pd.to_datetime(df_clean["date"])
 
     # Reindex to full months
-    df_rain = df_rain.reindex(full_mnths_index)
+    df_clean = df_clean.reindex(full_mnths_index)
 
     # Remove station code and "incomplete" date column
     drop_cols = ["date", "station_code"]
-    df_rain = df_rain.loc[:,~df_rain.columns.isin(drop_cols)]
+    df_clean = df_clean.loc[:,~df_clean.columns.isin(drop_cols)]
 
     # Rename full-month index to "date"
-    df_rain = df_rain.rename_axis(index="date")
+    df_clean = df_clean.rename_axis(index="date")
 
     # Return DataFrame with "date" as index, `param_col` as column
-    return df_rain
+    return df_clean
 
 
-def check_years_to_impute(df_rain: pd.DataFrame,
+def check_years_to_impute(df_clean: pd.DataFrame,
                           param_col: str = "rain_sum") -> tuple[bool, list]:
     """"""
     # Set non-requirement of imputation as default
     try_impute = False
 
     # Safeguard function from changing input DataFrame in any way
-    df_r = df_rain.copy()
+    df_c = df_clean.copy()
 
     # Ensure that "date" is in the columns
-    if df_r.index.name == "date":
-        df_r = df_r.reset_index()
+    if df_c.index.name == "date":
+        df_c = df_c.reset_index()
 
     # Create custom aggregator for counting NaN percentage per group
     agg_func = pd.NamedAgg(column=param_col,
@@ -179,13 +179,13 @@ def check_years_to_impute(df_rain: pd.DataFrame,
     grouper_obj = pd.Grouper(key="date", freq="MS")
 
     # Perform the grouping to the DataFrame to get monthly NaN percentages
-    df_r_gr = df_r.groupby(grouper_obj).agg(result=agg_func)
+    df_c_gr = df_c.groupby(grouper_obj).agg(month_nan_perc=agg_func)
 
     # Add column to indicate the year
-    df_r_gr["year"] = df_r_gr.index.year
+    df_c_gr["year"] = df_c_gr.index.year
 
     # Find unique years to run imputation for
-    years_to_impute = df_r_gr[df_r_gr["result"] > 0]["year"].tolist()
+    years_to_impute = df_c_gr[df_c_gr["month_nan_perc"] > 0]["year"].tolist()
     years_to_impute = list(set(years_to_impute))
 
     # Sort the years chronologically (if any)
@@ -199,8 +199,8 @@ def check_years_to_impute(df_rain: pd.DataFrame,
     return (try_impute, years_to_impute)
 
 
-def find_imputation_stations(years_to_impute: list,
-                             stn_code: int,
+def find_imputation_stations(stn_code: int,
+                             years_to_impute: list,
                              param_col: str = "rain_sum",
                              max_nr_impute_stns: int = 5,
                              min_imp_corr: float = 0.25
@@ -304,7 +304,7 @@ def impute_vals_from_targetcol(df_imp: pd.DataFrame,
     (best_imputer, results_dict, _) = (
         mice_imputation_utils.fit_best_df_imputer_on_targetcol(
             df_imp=df_imp,
-            target_colname=target_col,
+            target_col=target_col,
             print_progress=print_progress))
 
     # Only use imputed data if the r2 is good enough!
@@ -341,7 +341,7 @@ def impute_vals_from_targetcol(df_imp: pd.DataFrame,
 
 def merge_measured_and_imputed_data(df_data: pd.DataFrame, 
                                     df_imputed: pd.DataFrame | None,
-                                    param_col: bool,
+                                    param_col: str,
                                     round_to_n_decimals: int = 2
                                     ) -> pd.DataFrame:
     """"""
@@ -353,13 +353,16 @@ def merge_measured_and_imputed_data(df_data: pd.DataFrame,
     
     # If no imputation was run, only add all-NaN imputation column
     else:
-        df_data_all = df_data.round(round_to_n_decimals)
+        if "date" not in df_data_all.columns:
+            df_data_all = df_data.reset_index()
+
+        df_data_all = df_data.reseround(round_to_n_decimals)
         df_data_all[param_col + "_imputed"] = np.nan
 
     return df_data_all
 
 
-def simplify_dataset(df_data_all: pd.DataFrame, param_col: str | int):
+def simplify_dataset(df_data_all: pd.DataFrame, param_col: str):
     """"""
     # Copy DataFrame object to prevent changing input df in-place
     df_data = df_data_all.copy()
@@ -381,17 +384,21 @@ def simplify_dataset(df_data_all: pd.DataFrame, param_col: str | int):
     keep_cols = ["date", param_col + "_all", "is_imputed"]
     df_data = df_data[keep_cols]
 
+    # Rename filled column back to original parameter name
+    rename_cols = {param_col + "_all": param_col}
+    df_data = df_data.rename(columns=rename_cols)
+
     # Return the result
     return df_data
 
 
-def agg_to_grouped(df_data: pd.DataFrame, param_col: str | int, N: int):
+def agg_to_grouped(df_data: pd.DataFrame, param_col: str, N_months: int):
     """"""
 
     # Set aggregation rules; any aggregate that still has any NaN(s) 
     # in its value is summed to NaN as a whole (prevent dist-fit errors)
     lambda_sum_func = lambda x: np.nan if x.isnull().any() else x.sum()
-    agg_dict = {param_col + "_all": lambda_sum_func,
+    agg_dict = {param_col: lambda_sum_func,
                 "is_imputed": "mean"}
     
     # Aggregate dataset to monthly sums
@@ -401,13 +408,13 @@ def agg_to_grouped(df_data: pd.DataFrame, param_col: str | int, N: int):
                         .agg(agg_dict))
     
     # Use rolling window to get aggregated totals for N months
-    df_time_grouped = df_month_grouped.rolling(window=N).agg(agg_dict)
+    df_time_grouped = df_month_grouped.rolling(window=N_months).agg(agg_dict)
 
     return df_time_grouped
 
 
 def fit_distr_to_series(df_grouped: pd.DataFrame, 
-                        param_col: str | int,
+                        param_col: str,
                         distr_name: str = "best"):
     """"""
     # Time for fitting a distribution! 
@@ -435,7 +442,7 @@ def fit_distr_to_series(df_grouped: pd.DataFrame,
 
     # Prepare DataFrame for storing results for each distribution (_pdf, _cdf)
     df_distr = pd.DataFrame()
-    df_distr[param_col] = df_grouped[param_col + "_all"].copy()
+    df_distr[param_col] = df_grouped[param_col].copy()
 
     # Set any total of 0 mm to 0.1 mm (avoid zero-issues with gamma)
     # Important: in arid regions, this may not suffice for a good fit
@@ -456,12 +463,14 @@ def fit_distr_to_series(df_grouped: pd.DataFrame,
 
 
     # Also calculate empirical CDF (for checking goodness-of-fit)
-    ecdf_res = scs.ecdf(df_grouped[param_col + "_all"].dropna())
-    df_distr["ecdf"] = ecdf_res.cdf.evaluate(df_grouped[param_col + "_all"])
+    ecdf_res = scs.ecdf(df_grouped[param_col].dropna())
+    df_distr["ecdf"] = ecdf_res.cdf.evaluate(df_grouped[param_col])
 
-    best_distr = distr_name
+    # Ensure empirical CDF (ECDF) is always NaN for NaN-values (and not 1.0)
+    df_distr.loc[df_distr[param_col].isna(), "ecdf"] = np.nan
 
     # Find best-fitting distr. if 'best' is chosen (default)
+    best_distr = distr_name
     if distr_name.lower() == "best":
 
         # Use L2-norm distance to determine best fit
@@ -478,8 +487,8 @@ def fit_distr_to_series(df_grouped: pd.DataFrame,
     return (df_distr, best_distr)
 
 
-def inverse_normal_bestfit_cdf(df_distr: pd.DataFrame,
-                               best_distr: str):
+def cdf_bestfit_to_z_scores(df_distr: pd.DataFrame,
+                            best_distr: str):
     """"""
     # Apply inverse normal distribution to best-fit CDF;
     # this will give us a Z-score (Standardized Index)
@@ -488,3 +497,114 @@ def inverse_normal_bestfit_cdf(df_distr: pd.DataFrame,
 
     # Return result (Z-score; Standardized Index)
     return norm_ppf
+
+
+def calculate_nmonth_spi(df_data: pd.DataFrame, 
+                         param_col: str,
+                         N_monthlist: list[int] = [1, 3, 6, 9, 12, 24],
+                         distr_name: str = "best"):
+    """"""
+    # Create a monthly dataset (so that later indexes will align)
+    df_month = agg_to_grouped(df_data, param_col, 1)
+
+    # Now, calculate SPIs and fit best distributions for N-month series
+    for N in N_monthlist:
+        df_grouped = agg_to_grouped(df_data, param_col, N)
+        (df_distr, best_distr) = fit_distr_to_series(df_grouped, param_col, 
+                                                     distr_name = distr_name)
+        df_month[f"spi_{N}"] = cdf_bestfit_to_z_scores(df_distr, best_distr)
+
+    return df_month
+
+
+def calculate_nmonth_spei(df_data: pd.DataFrame, 
+                          param_col: str,
+                          N_monthlist: list[int] = [1, 3, 6, 9, 12, 24],
+                          distr_name: str = "best"):
+    """"""
+    # Create a monthly dataset (so that later indexes will align)
+    df_month = agg_to_grouped(df_data, param_col, 1)
+
+    # Add offset to all datapoints to avoid < 0 values for distr. fitting!
+    df_minval = df_data[param_col].min()
+    df_data_mod = df_data.copy()
+
+    # Only apply offset if min. val. is actually negative
+    if df_minval < 0:
+        df_data_mod.loc[:, param_col] += np.abs(df_minval)
+
+    # Now, calculate SPEIs and fit best distributions for N-month series
+    for N in N_monthlist:
+        df_grouped = agg_to_grouped(df_data_mod, param_col, N)
+        (df_distr, best_distr) = fit_distr_to_series(df_grouped, param_col, 
+                                                     distr_name = distr_name)
+        df_month[f"spei_{N}"] = cdf_bestfit_to_z_scores(df_distr, best_distr)
+
+    return df_month
+
+
+def get_events_from_z_scores(df_si: pd.DataFrame,
+                             vals_col: str,
+                             event: str):
+    """"""
+    # Define events and Z-score thresholds
+    ev_thrshs = {"extreme_wetness": 2.0, 
+                 "severe_wetness": 1.5, 
+                 "wetness": 1.0, 
+                 "drought": -1.0, 
+                 "severe_drought": -1.5,
+                 "extreme_drought": -2.0}
+    
+    if event not in ev_thrshs.keys():
+        raise ValueError("Invalid 'event'; please choose from this list: "
+                         f"{", ".join([e for e in ev_thrshs.keys()])}")
+    
+    # Create copy of input DataFrame (to avoid changing input DataFrame)
+    df_stzd = df_si.copy()
+
+    # If 'date' is still the index: convert it to a column (for grouping)
+    if "date" not in df_stzd.columns:
+        df_stzd = df_stzd.reset_index()
+
+    # Mark for each row whether value exceeds threshold value or not;
+    # use .gt()-method if > 0; use .lt()-method if <= 0
+    gt_or_lt = ("gt" if ev_thrshs[event] > 0 else "lt")
+    df_stzd["is_" + event] = getattr(df_stzd[vals_col], 
+                                     gt_or_lt)(ev_thrshs[event])
+
+    # Create a unique identifier for each drought event;
+    # every new event is part of the event, while row above is not
+    is_new_event = (df_stzd["is_" + event] 
+                    & (~df_stzd["is_" + event]
+                    .shift(fill_value=False)))
+
+    # Convert every new found event to a new ID
+    df_stzd[event + "_id"] = is_new_event.cumsum()
+
+    # Filter out (exclude) non-event values 
+    df_stzd.loc[~df_stzd["is_" + event], event + "_id"] = None
+
+    # Custom aggregation dictionary
+    agg_dict = {
+        # First start index of the event
+        "first_start_idx": ("date", "min"),
+        # Last start index of the event
+        "last_start_idx": ("date", "max"),
+        # Magnitude of the event (as total sums of the Z-index)
+        "magnitude": (vals_col, lambda x: np.sum(np.abs(x)).round(2)),
+        # Duration of the event (number of subsequent rows in same event)
+        "duration": (vals_col, "count"),
+    }
+
+    # Prepend reference for event and SP(E)I-"n" source
+    agg_dict = {event + "_" + vals_col + "_" + k: v 
+                for k, v in agg_dict.items()}
+
+    # Create overview of all identified events
+    events_df = (
+        df_stzd[df_stzd["is_" + event]]
+        .groupby(event + "_id")
+        .agg(**agg_dict)
+        .reset_index(drop=True))
+    
+    return events_df
