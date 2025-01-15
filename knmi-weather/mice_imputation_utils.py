@@ -13,6 +13,7 @@ functions:
     * get_models_params_grids - get sklearn models, param grids to test
     * fit_best_df_imputer_on_targetcol - fit best MICE model, score on one col
     * run_best_imputer_on_dataset - run best imputer on the entire dataset
+
 """
 import copy
 import numpy as np
@@ -169,7 +170,7 @@ def fit_best_df_imputer_on_targetcol(df_imp: pd.DataFrame,
     test_vals = complete_data.loc[missing_mask, target_col].to_numpy()
 
     # Set base imputer settings (we will only vary the model used later on)
-    base_imputer = IterativeImputer(max_iter=30, tol=1e-6, random_state=r_seed,
+    base_imputer = IterativeImputer(max_iter=20, tol=1e-4, random_state=r_seed,
                                     min_value=min_impval, max_value=max_impval,
                                     imputation_order="roman")
 

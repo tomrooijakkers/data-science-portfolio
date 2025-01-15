@@ -15,6 +15,7 @@ functions:
     * transform_param_values - transform raw values to cleaned df
     * knmi_hourslot_percentage_df - aggregate KNMI data to hour slots
     * get_multiyr_hourslot_percentages - make multi-year hour slot df
+
 """
 
 import datetime
@@ -137,7 +138,7 @@ def get_measured_stn_precip_values(stn_code: int,
         month=(last_date.month % 12) + 1,
         day=1) - datetime.timedelta(days=1))
     
-    # 3. Missing indexes in the range should be filled with NaNs
+    # 3. Always has NaNs for missing indexes in the range
     full_mnths_index = pd.date_range(target_first_date,
                                      target_last_date, freq="D")
 
@@ -353,10 +354,12 @@ def merge_measured_and_imputed_data(df_data: pd.DataFrame,
     
     # If no imputation was run, only add all-NaN imputation column
     else:
+        df_data_all = df_data.round(round_to_n_decimals)
+
+        # Ensure that "date" is a separate column in the output df
         if "date" not in df_data_all.columns:
             df_data_all = df_data.reset_index()
 
-        df_data_all = df_data.reseround(round_to_n_decimals)
         df_data_all[param_col + "_imputed"] = np.nan
 
     return df_data_all
@@ -379,7 +382,7 @@ def simplify_dataset(df_data_all: pd.DataFrame, param_col: str):
     filt_idxs = df_data[df_data[param_col + "_all"].isna()].index
     df_data.loc[filt_idxs, param_col + "_all"] = (
         df_data[param_col + "_imputed"].copy())
-    
+
     # Only keep date, parameter column and imputation label (yes/no)
     keep_cols = ["date", param_col + "_all", "is_imputed"]
     df_data = df_data[keep_cols]
@@ -390,6 +393,69 @@ def simplify_dataset(df_data_all: pd.DataFrame, param_col: str):
 
     # Return the result
     return df_data
+
+
+def imputation_workflow(df_cleaned: pd.DataFrame,
+                        param_col: str,
+                        stn_code: str | int,
+                        print_progress: bool = True):
+    """"""
+    # Step 1: Find whether there are missing values; get covering years
+    (try_impute, yrs_to_imp) = check_years_to_impute(df_cleaned,
+                                                     param_col = param_col)
+
+    # Step 2: If missing values found, find any non-NaN values of other stns
+    run_impute = False
+    if try_impute:
+        (run_impute, impute_stns, df_imp) = (
+            find_imputation_stations(stn_code = stn_code, 
+                                     years_to_impute = yrs_to_imp,
+                                     param_col = param_col)
+        )
+
+    # Set up empty DataFrame of imputed values (in case of no imputation)
+    df_imputed = None
+
+    # Step 3: If reasonably correlating other stns found: use to impute,
+    # using the best-fit model for iterative (MICE) data imputation
+    if run_impute:
+        df_imp = filter_datacols_to_impute(df_imp, stn_code, impute_stns)
+        df_imputed = impute_vals_from_targetcol(
+            df_imp, stn_code, param_col, print_progress = print_progress)
+    
+    # Step 4: Merge measured and imputed data to one DataFrame (if available)
+    df_data_all = merge_measured_and_imputed_data(df_cleaned, df_imputed, 
+                                                  param_col = param_col)
+    
+    # Step 5: Combine measured and imputed data to one series (if available)
+    df_data_sel = simplify_dataset(df_data_all, param_col)
+    
+    return df_data_sel
+
+
+def calc_rain_min_evap_df(df_rain_data: pd.DataFrame,
+                          df_evap_data: pd.DataFrame,
+                          rain_param_col: str = "rain_sum",
+                          evap_param_col: str = "evap_ref"):
+    """"""
+    # Merge rain and evap datasets on date (use "left" to keep index)
+    df_pcp_data = df_rain_data.merge(df_evap_data, on="date", how="left",
+                                     suffixes=('_rain', '_evap'))
+
+    # Summarize final imputation marker column as average imp. per row
+    imp_cols = ["is_imputed_rain", "is_imputed_evap"]
+    df_pcp_data["is_imputed"] = (df_pcp_data[imp_cols].astype(float)
+                                 .sum(axis=1, skipna=False) / len(imp_cols))
+
+    # Calculate (precipitation - evaporation) from the rain and evap columns
+    df_pcp_data["rain_min_evap"] = (df_pcp_data[rain_param_col] 
+                                    - df_pcp_data[evap_param_col])
+
+    # Only keep transformed columns; return the result
+    keep_cols = ["date", "rain_min_evap", "is_imputed"]
+    df_pcp_data = df_pcp_data[[col for col in keep_cols]]
+
+    return df_pcp_data
 
 
 def agg_to_grouped(df_data: pd.DataFrame, param_col: str, N_months: int):
@@ -416,18 +482,19 @@ def agg_to_grouped(df_data: pd.DataFrame, param_col: str, N_months: int):
 def fit_distr_to_series(df_grouped: pd.DataFrame, 
                         param_col: str,
                         distr_name: str = "best"):
-    """"""
-    # Time for fitting a distribution! 
-
-    # We will use (just as in: https://journals.ametsoc.org/view/journals/apme/53/10/jamc-d-14-0032.1.xml):
-    # 1. Gamma distribution function (note: totals should be nonzero!)
+    """
+    
+    (just as in: https://journals.ametsoc.org/view/journals/apme/53/10/jamc-d-14-0032.1.xml)
+    """
+    # We will have the following distributions as options:
+    # 1. Gamma distribution function (note: totals should then be nonzero!)
     # 2. Exponential distribution function
     # 3. Lognormal distribution function
     # 4. Weibull distribution function
     supported_distrs = ["gamma", "expon", "lognorm", "weibull_min"]
     
     if distr_name.lower() == "best":
-        # Fit to all supported distributions, fit best (default)
+        # Fit to all supported distributions and choose the best one (default)
         dist_names = supported_distrs
     elif distr_name.lower() in supported_distrs:
         # Only fit to desired distribution if set as explicit input
@@ -473,7 +540,7 @@ def fit_distr_to_series(df_grouped: pd.DataFrame,
     best_distr = distr_name
     if distr_name.lower() == "best":
 
-        # Use L2-norm distance to determine best fit
+        # Use L2-norm distance to ECDF to determine best fit
         distances = {}
         for dist_name in dist_names:
             # Squared differences (L2-norm)

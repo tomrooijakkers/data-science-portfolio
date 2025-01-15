@@ -14,7 +14,8 @@ functions:
     * centered_symmetric_linear - symm. lin-func. with peak at N_max/2
     * blend_colormaps_cyclically - mix two cmaps to get cyclic hex color codes
     * cyclic_hourslot_boxplot - create KNMI cyclic-cmap h-slot boxplot of data
-    * ordinary_kriging_nl_plot - create interpolation plot over The Netherlands
+    * ordinary_kriging_nl_plot - create interpolation plot of The Netherlands
+    * standardized_index_heatmap - plot heatmap of historic SP(E)I values
 
 """
 
@@ -22,12 +23,13 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-from functools import partial
-
 from matplotlib import colors as cl
 from matplotlib import colormaps as cm
-from pykrige.ok import OrdinaryKriging
+from matplotlib.ticker import MaxNLocator
 from mpl_toolkits.basemap import Basemap
+
+from functools import partial
+from pykrige.ok import OrdinaryKriging
 
 
 def centered_symmetric_linear(N: float, N_max: float,
@@ -410,4 +412,139 @@ def ordinary_kriging_nl_plot(locs_x, locs_y, values,
     # Add the title and return the final Axes object for plotting
     plt.title(plot_title, fontsize=18, **textfont)
     
+    return ax
+
+
+def standardized_index_heatmap(df_sp_data : pd.DataFrame,
+                               sp_col : str,
+                               stn_loc_name : str,
+                               size_factor : int = 2):
+    """
+    Plot heatmap of historic SP(E)I values for marking drought/wetness.
+
+    Expects SP(E)I input for a single location (measurement station).
+
+    Dry periods are labeled with yellow / orange / red colors, "normal"
+    periods are shown in white, and wet periods in shades of blue. NaNs
+    are shown in grey.
+
+    The SP(E)I values are categorized using the following definitions:
+    - Less than 1.0 offset from the mean: "normal" conditions
+    - At least 1.0 offset: drought / wetness period
+    - At least 1.5 offset: severe drought / wetness
+    - At least 2.0 offset: extreme drought / wetness
+    - At least 3.0 offset: exceptional drought / wetness
+
+    Parameters
+    ----------
+    df_sp_data : pd.DataFrame
+        DataFrame with SPE(I) timeseries, in which column `sp_col` needs
+        to be present for the plot function to work.
+    sp_col : str
+        Column name of the col containing the SP(E)I values, e.g.: 'spi_3'.
+    stn_loc_name : str
+        Description of the location to use for the plot's title, e.g.:
+        'De Bilt (260)'.
+    size_factor : int, optional
+        Determines the size of the plot; other items should scale along
+        accordingly. The default value is 2.
+
+    Returns
+    -------
+    plt.Axes
+        The matplotlib Axes object containing the heatmap plot.
+
+    Notes
+    -----
+    - The input DataFrame needs to have "month" and "year" columns.
+    - Using a different SP(E)I timescale may yield vastly different results.
+    """
+    # Pivot the DataFrame for heatmap; keep NaNs (mark as grey later on)
+    heatmap_data = df_sp_data.pivot_table(index="year", columns="month",
+                                          values=sp_col, dropna=False)
+
+    # Create prettified text version for SP(E)I variant
+    sp_text = sp_col.upper().replace("_", "-")
+
+    # Define custom styles for plot text and ticks
+    textfont = {"fontname": "Palatino"}
+    tickfont = {"fontname": "Georgia"}
+
+    # Define category-to-color mapping
+    cat_colors = {
+        -9.9: "#820e0e",
+        -3.0: "#c1251b",
+        -2.0: "#fb7936",
+        -1.5: "#fde069",
+        -1.0: "white",
+         0.0: "white",
+         1.0: "#daedff",
+         1.5: "#38a1f7",
+         2.0: "#1953b7",
+         3.0: "#1953b7",
+         9.9: "#072f75"
+    }
+
+    # Pre-set X (month) and Y (year) indicators
+    xs = heatmap_data.columns
+    ys = heatmap_data.index
+
+    # Set x-axis labels for the months
+    xlabels = ["J", "F", "M", "A", "M", "J", 
+               "J", "A", "S", "O", "N", "D"]
+
+    # Automatic plot scaling to ensure "square"-like heatmap results
+    scale_factor = 0.75 * len(ys)/len(xs)
+    fig, ax = plt.subplots(figsize=(size_factor, int(scale_factor 
+                                                     * size_factor)))
+
+    # Create custom colormap using the defined cats and bounds
+    cmap = cl.ListedColormap([cat_colors[cat] for cat in cat_colors])
+    bounds = list(cat_colors.keys())
+    norm = cl.BoundaryNorm(bounds, cmap.N)
+
+    # Plot NaN values first; use a gray tint to mark those points
+    ax.imshow(
+        np.isnan(heatmap_data),
+        cmap=cl.ListedColormap(["white", "#b5b5b5"]),
+        aspect="auto",
+        interpolation="nearest")
+
+    # Use 'imshow' to superimpose non-NaN values of the heatmap on the plot
+    heatmap = ax.imshow(
+        heatmap_data,
+        cmap=cmap,
+        norm=norm,
+        aspect="auto",  
+        interpolation="nearest")
+
+    # Add colorbar with corresponding category labels
+    cbar = fig.colorbar(heatmap, ax=ax, boundaries=bounds[1:-1], 
+                        ticks=bounds[1:-1], spacing="uniform")
+    cbar.ax.set_yticklabels([f"{c}" for c in list(cat_colors.keys())[1:-1]],
+                            fontsize=10, **tickfont)
+    cbar.set_label(f"Category ({sp_text})", fontsize=10, **textfont)
+
+    # Set title of plot; try to align centrally within the plot
+    ax.set_title(f"{sp_text} Heatmap - {stn_loc_name}", fontsize=14, 
+                 x=0.7, y=1.015, **textfont)
+
+    # Customize x-ticks (months)
+    ax.set_xticks(np.arange(len(xs)))
+    ax.set_xticklabels(xlabels, fontsize=8, **tickfont)
+
+    # Customize y-ticks (years)
+    ax.set_yticks(np.arange(len(ys)))
+    ax.set_yticklabels(ys, fontsize=10, **tickfont)
+
+    # Set y-axis ticks dynamically: try to always get multiples of 5 years
+    ax.yaxis.set_major_locator(MaxNLocator(integer=True, nbins=(len(ys)//5)+1, 
+                                           prune="both"))
+
+    # Add subtle grid lines and minor ticks for better readability
+    ax.set_xticks(np.arange(-0.5, len(xs)), minor=True)
+    ax.set_yticks(np.arange(-0.5, len(ys)), minor=True)
+    ax.grid(which="minor", color="lightgray", linestyle="--", linewidth=0.15)
+    ax.tick_params(which="minor", size=1.5)
+
     return ax
