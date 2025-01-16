@@ -84,6 +84,7 @@ def transform_param_values(df_raw: pd.DataFrame,
     -------
     pd.DataFrame
         Cleaned DataFrame with parameter cols and values.
+
     """
     # Validate mode for correct filename link
     if "HH" not in df_raw.columns:
@@ -222,6 +223,7 @@ def knmi_hourslot_percentage_df(start_date: datetime.date,
     summaries are only directly available in 'daily' mode.
     - The output percentages are normalized per station, based on
     total occurrences.
+
     """
     # Translate parameter names back to parameter codes for request
     par_dct = load_tf_json("transform_params_day.json")
@@ -352,6 +354,7 @@ def get_multiyr_hourslot_percentages(year_start: int,
       arguments can be passed via `**kwargs`.
     - The data is aggregated using a summation of counts, and percentages are 
       calculated column-wise after aggregation.
+
     """
     # Fetch KNMI data year by year (to prevent overflow of service error)
     df_h_list = []

@@ -1,7 +1,7 @@
 """MICE Imputation Utils
 
 This script contains the utility / helper functions for applying a MICE
-(Multiple Imputation by Chained Equations) procedure, where the best-scoring 
+(Multivariate Imputation by Chained Equations) procedure, where the best-scoring 
 model based on a single target column is selected.
 
 This script requires that `pandas`, `numpy`, and `sklearn` be installed 
@@ -144,6 +144,7 @@ def fit_best_df_imputer_on_targetcol(df_imp: pd.DataFrame,
     >>> res_tuple = fit_best_df_imputer_on_targetcol(df_imp, target_col)
     >>> # 2. Then, use function below on 100% of dataset as real run
     >>> df_imputed = run_best_imputer_on_dataset(df_imp, res_tuple[0])
+
     """
     # Set random seed value for result reproducibility (if defined)
     if r_seed:
@@ -284,7 +285,7 @@ def run_best_imputer_on_dataset(df_imp: pd.DataFrame,
     
     Notes
     -----
-    Is set up to work with any class that inherits from `_BaseImputer`.
+    - Is set up to work with any class that inherits from `_BaseImputer`.
 
     """
     # Fit and run the best imputer on the *full* to-impute dataset
