@@ -69,9 +69,10 @@ def validate_station_code(stn_code: int) -> dict:
     stn_dict = (stations_raw[stations_raw["STN"] == stn_code]
                 .to_dict(orient="list"))
 
-    # AssertionError message with valid options if station code is not valid
+    # AssertionError message with valid options if stn. code invalid
     valid_stns_str = ", ".join(str(x) for x in stations_raw["STN"])
-    err_msg = f"Invalid station code (integer) - valid options: {valid_stns_str}."
+    err_msg = ("Invalid station code (integer) - valid options: "
+               f"{valid_stns_str}.")
 
     assert len(stn_dict["NAME"]) > 0, err_msg
 
@@ -253,8 +254,8 @@ def check_years_to_impute(df_clean: pd.DataFrame,
         df_c = df_c.reset_index()
 
     # Create custom aggregator for counting NaN percentage per group
-    agg_func = pd.NamedAgg(column=param_col,
-                           aggfunc=lambda x: 100.0 * np.mean(np.isnan(x)))
+    agg_lambda = lambda x: 100.0 * np.mean(np.isnan(x))
+    agg_func = pd.NamedAgg(column=param_col, aggfunc=agg_lambda)
     
     # Define grouper to group on dates by month, keep month starts as label
     grouper_obj = pd.Grouper(key="date", freq="MS")
@@ -1047,6 +1048,12 @@ def get_events_from_z_scores(df_si: pd.DataFrame,
     Identifies first and last start indexes of each event, their
     duration (e.g. months) and total magnitude (sum of SP(E)I-N scores).
 
+    Events are defined as subsequent periods in which the SP(E)I-N score
+    is at least as far from the mean as the event threshold. This means,
+    for example, that a "severe_wetness" event starts in the first month
+    with a score above 1.5, and ends whenever the score starts falling
+    below 1.5 again.
+
     Parameters
     ----------
     df_si : pd.DataFrame
@@ -1060,12 +1067,16 @@ def get_events_from_z_scores(df_si: pd.DataFrame,
     -------
     events_df : pd.DataFrame
         DataFrame with listed events, including duration and magnitude.
+        The column labels are prepended with `event` and `vals_col`
+        for traceability purposes.
     
     Notes
     -----
     - The thresholds indicated in this function are in line with the WMO
     (World Meteorological Organization) definitions at the moment of writing.
-
+    - In some other definitions, events are only marked as ended when the
+    SP(E)I-N index completely flips sign (0.0). If you need to apply that 
+    definition, please implement your own custom function for this. 
     """
     # Define events and Z-score thresholds
     ev_thrshs = {"extreme_wetness": 2.0, 
