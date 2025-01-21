@@ -141,9 +141,9 @@ def get_measured_stn_param_values(stn_code: int,
     - Running this function takes 30 secs - 1 min per ~100 yrs of data.
     - To speed up, please select a shorter timeframe.
     """
-    # Parse year to last year if no final year was specified
-    if end_year is None:
-        end_year = datetime.utcnow().year - 1
+    # Parse year to last year (in UTC) if no final year was specified
+    if end_year is None:     
+        end_year = datetime.datetime.now(datetime.timezone.utc).year - 1
 
     # Find associated parameter code for KNMI request
     param_code = param_code_from_col(param_col)
@@ -365,15 +365,15 @@ def find_imputation_stations(stn_code: int,
     # Flatten pivot table to single index
     df_imp.columns = df_imp.columns.get_level_values(1)
 
-    # Get correlation scores
-    corr_scores = (df_imp
-                   .corrwith(df_imp[stn_code])
+    # Get correlation scores; sort them (take absolute value)
+    corr_scores = (((df_imp
+                   .corrwith(df_imp[stn_code]) ** 2) ** 0.5)
                    .sort_values(ascending=False))
     
     # Drop NaNs from the correlation scores
     corr_scores = corr_scores[~corr_scores.isna()]
 
-    # Find up to N best-correlating stations for imputation years;
+    # Find up to N highest-correlating stations for imputation years;
     # note: less stations will be used in case of empty results
 
     # Get maximum index: minimum of N and non-NaN corr elements
@@ -444,6 +444,7 @@ def impute_vals_from_targetcol(df_imp: pd.DataFrame,
                                target_col: str | int,
                                param_col: str = "rain_sum",
                                r2_min_thresh: float = 0.50,
+                               test_frac: float = 0.25,
                                print_progress: bool = True) -> pd.DataFrame:
     """
     Impute DataFrame values from `target_col` by use of a MICE algorithm.
@@ -464,6 +465,10 @@ def impute_vals_from_targetcol(df_imp: pd.DataFrame,
         Minimum R^2 value that the best-fit model should score in order
         for calc. imputed values to be interpreted as useful at all.
         The default value is 0.50.
+    test_frac : float, optional
+        The fraction of data in `target_col` to randomly set to NaN.
+        Used for testing the quality-of-fit of the MICE model.
+        The default value is 0.25.
     print_progress : bool, optional
         Whether to print statement of the intermediary steps, mainly when
         applying the fits to the imputation models.
@@ -498,6 +503,7 @@ def impute_vals_from_targetcol(df_imp: pd.DataFrame,
         mice_imputation_utils.fit_best_df_imputer_on_targetcol(
             df_imp=df_imp,
             target_col=target_col,
+            test_frac=test_frac,
             print_progress=print_progress))
 
     # Only use imputed data if the r2 is good enough!

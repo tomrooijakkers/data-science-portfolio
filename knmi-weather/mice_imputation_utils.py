@@ -115,7 +115,7 @@ def fit_best_df_imputer_on_targetcol(df_imp: pd.DataFrame,
         The name or ID of the target column to score the imputation on.
     test_frac : float, optional
         The fraction of data in `target_col` to randomly set to NaN.
-        Used for testing quality-of-fit of the MICE model.
+        Used for testing the quality-of-fit of the MICE model.
         The default value is 0.25.
     r_seed : int or None, optional
         Random seed value to use in case of desired reproducilibity.
@@ -254,10 +254,13 @@ def fit_best_df_imputer_on_targetcol(df_imp: pd.DataFrame,
         print(f"  Imputation RMSE: {final_results["rmse"]:.4f}")
         print(f"  Imputation R^2: {final_results["r2"]:.4f}")
 
+    # Only keep non-fully-NaN columns in final overview
+    notnull_cols = complete_data.columns[~complete_data.isnull().all()]
+
     # Convert NumPy array of results (back) to DataFrame format
     filled_imp_df = pd.DataFrame(data=final_imputed_data,
                                  index=complete_data.index,
-                                 columns=complete_data.columns)
+                                 columns=notnull_cols)
 
     # Return best imp. object, result scores, and imp. df (for tests)
     return (best_imputer, final_results, filled_imp_df)
