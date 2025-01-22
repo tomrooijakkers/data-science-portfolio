@@ -438,8 +438,8 @@ def standardized_index_heatmap(df_sp_data : pd.DataFrame,
     Parameters
     ----------
     df_sp_data : pd.DataFrame
-        DataFrame with SPE(I) timeseries, in which column `sp_col` needs
-        to be present for the plot function to work.
+        DataFrame with SPE(I) timeseries, in which columns `sp_col`,
+        `month` and `year` need to be present to produce a plot.
     sp_col : str
         Column name of the col containing the SP(E)I values, e.g.: 'spi_3'.
     stn_loc_name : str
