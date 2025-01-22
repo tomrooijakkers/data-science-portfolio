@@ -52,16 +52,20 @@ def knmi_get_all_parameter_codes(url: str) -> list[dict]:
         param_text = param_el.text_content().strip().split(": ")
         param_desc = param_text[1].strip().replace(". Meer info", "")
         
-        # Edge case: some descriptions contain multiple colon-seps; then only skip first item
+        # Edge case: some descriptions contain multiple colon-seps; 
+        # only skip first item in those cases
         if len(param_text) > 2:
-            param_desc = ": ".join(param_text[1:-1]).strip().replace(". Meer info", "")
+            param_desc = ": ".join((param_text[1:-1]).strip()
+                                   .replace(". Meer info", ""))
         
         param_list.append({"parameter_code": param_text[0],
                            "parameter_desc": param_desc})
 
-    # Raise an error if less than two stations were found (something must have gone wrong then)
+    # Raise an error if less than two stations were found;
+    # something must have gone wrong in that case
     if len(param_list) < 2:
-        raise AssertionError(f"Incomplete/empty param. list (len: {len(param_list)} returned.")
+        err_msg = "Incomplete or empty param. list "
+        raise AssertionError(err_msg + f"(len: {len(param_list)} returned.")
     
     return param_list
 
@@ -121,7 +125,7 @@ def knmi_station_content_to_df(knmi_response_content: bytes) -> pd.DataFrame:
         # STN and first alphabetic param form the station data cut-offs
         split_text = "# STN "
 
-        # Only keep string portion between 1st and 2nd cutoff, replace first '#'
+        # Only keep string portion between 1st & 2nd cutoff, replace first '#'
         string_data = (split_text.replace("# ", "")
                        + (string_buffer.getvalue().split(split_text)[1]))
 
@@ -190,15 +194,17 @@ def knmi_update_all_metadata() -> None:
 
     # Update daily and hourly parameter data
     print("Updating daily parameter metadata...")
-    knmi_update_parameter_metadata(d_sourceurl, "knmi_parameters_daily.json")
+    knmi_update_parameter_metadata(d_sourceurl,
+                                   "knmi_parameters_daily.json")
     print("Success.")
 
     print("Updating hourly parameter metadata...")
-    knmi_update_parameter_metadata(h_sourceurl, "knmi_parameters_hourly.json")
+    knmi_update_parameter_metadata(h_sourceurl, 
+                                   "knmi_parameters_hourly.json")
     print("Success.")
 
     # Update station data (by doing a data-less request to KNMI service)
     print("Updating meteo station metadata...")
-    knmi_update_meteo_station_metadata(d_sourceurl, "knmi_meteo_stations.json")
+    knmi_update_meteo_station_metadata(d_sourceurl,
+                                       "knmi_meteo_stations.json")
     print("Success.")
-    

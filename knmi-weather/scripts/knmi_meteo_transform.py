@@ -124,13 +124,13 @@ def transform_param_values(df_raw: pd.DataFrame,
         # Additional transformations for summable parameters
         if map_item["is_summable"]:
 
-            # Change all '-1' observations to 0 or 0.25 (indicates cat. 0 - 0.5)
+            # Change all '-1' obs. to 0 or 0.25 (indicates cat. 0 - 0.5)
             if nullify_small_sumvals:
                 df[colname] = df[colname].mask(df[colname] == -1, 0.)
             else:
                 df[colname] = df[colname].mask(df[colname] == -1, 0.25)
 
-            # Change leftover negative values to NaNs (summables have to be >= 0)
+            # Change negative values to NaNs (summables have to be >= 0)
             df[colname] = df[colname].mask(df[colname] < 0, np.NaN)
 
         # Multiply the column by its 'parameter_unit' to get base units
@@ -146,7 +146,8 @@ def transform_param_values(df_raw: pd.DataFrame,
 
     elif mode == "hourly":
         # Ensure that hours always fill up two characters
-        df["hour_filled"] = (df["hour"].astype(int) - 1).astype(str).str.zfill(2)
+        df["hour_filled"] = ((df["hour"].astype(int) - 1)
+                             .astype(str).str.zfill(2))
         df["datetime"] = (pd.to_datetime(
                             df[["date", "hour_filled"]]
                             .astype(str).sum(axis=1),
@@ -164,10 +165,11 @@ def knmi_hourslot_percentage_df(start_date: datetime.date,
                                 end_date: datetime.date,
                                 in_season: bool = False,
                                 param_col: str = "max_rain_hour_sum",
-                                hourslot_col: str = "hour_slot_max_rain_hour_sum",
+                                hslot_col: str = "hour_slot_max_rain_hour_sum",
                                 param_min_cutoff_val: float = 0.1,
                                 max_station_na_frac: float = 0.1,
-                                return_as_counts: bool = False) -> pd.DataFrame:
+                                return_as_counts: bool = False
+                                ) -> pd.DataFrame:
     """
     Convert KNMI data to hour slot occurrences as percentages.
 
@@ -194,7 +196,7 @@ def knmi_hourslot_percentage_df(start_date: datetime.date,
     param_col : str, optional
         The name of the column representing the meteorological 
         parameter to analyze. Default is "max_rain_hour_sum".
-    hourslot_col : str, optional
+    hslot_col : str, optional
         The name of the column representing the hour slots in 
         the data. Default is "hour_slot_max_rain_hour_sum".
     param_min_cutoff_val : float, optional
@@ -231,29 +233,30 @@ def knmi_hourslot_percentage_df(start_date: datetime.date,
 
     # Use key 'parameter_name' to find associated parameter codes
     param_codes = []
-    for col in [param_col, hourslot_col]:
+    for col in [param_col, hslot_col]:
         par_item = next((d for d in par_dct
                          if d["parameter_name"] == col), None)
 
         param_codes.append(par_item["parameter_code"])
 
     # Get dataset from KNMI web script service
-    df_day = knmi_meteo_ingest.knmi_meteo_to_df(meteo_stns_list=None,
-                                                meteo_params_list=param_codes,
-                                                start_date=start_date,
-                                                end_date=end_date,
-                                                in_season=in_season)
+    df_day = (knmi_meteo_ingest
+              .knmi_meteo_to_df(meteo_stns_list=None,
+                                meteo_params_list=param_codes,
+                                start_date=start_date,
+                                end_date=end_date,
+                                in_season=in_season))
     
     # Apply transformations to the raw dataset
     df_day_cleaned = transform_param_values(df_day)
 
     # Only select columns of interest
-    sel_cols = ["date", "station_code"] + [param_col, hourslot_col]
+    sel_cols = ["date", "station_code"] + [param_col, hslot_col]
     df_h = df_day_cleaned[sel_cols]
 
     # Separately label observationless days with hour slot -1
     is_cutoff = df_h[param_col] < param_min_cutoff_val
-    df_h.loc[is_cutoff, hourslot_col] = -1
+    df_h.loc[is_cutoff, hslot_col] = -1
     
     # Remove parameter column (not needed further)
     df_h = df_h.copy().drop(columns=[param_col])
