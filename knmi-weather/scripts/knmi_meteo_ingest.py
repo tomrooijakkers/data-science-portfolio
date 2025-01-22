@@ -35,10 +35,11 @@ from knmi_mode_validation import validate_mode
 
 def load_md_json_to_df(filename: str, datakey: str) -> pd.DataFrame:
     """Load metadata JSON to pd.DataFrame."""
-    with open(os.path.join("metadata", filename)) as f:
+    script_dir = os.path.dirname(__file__)
+    with open(os.path.join(script_dir, "metadata", filename)) as f:
         data = json.load(f)
         df = pd.DataFrame.from_records(data[datakey])
-    
+
     return df
 
 
