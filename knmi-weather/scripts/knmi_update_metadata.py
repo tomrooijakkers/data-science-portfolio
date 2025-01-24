@@ -55,8 +55,9 @@ def knmi_get_all_parameter_codes(url: str) -> list[dict]:
         # Edge case: some descriptions contain multiple colon-seps; 
         # only skip first item in those cases
         if len(param_text) > 2:
-            param_desc = ": ".join((param_text[1:-1]).strip()
-                                   .replace(". Meer info", ""))
+            param_desc = ": ".join((param_text[1:])
+                                   ).replace(")", ""
+                                   ).replace(". Meer info", "")
         
         param_list.append({"parameter_code": param_text[0],
                            "parameter_desc": param_desc})
@@ -74,7 +75,8 @@ def write_to_json_datafile(sourceurl: str, datalist: list[dict],
                            datakey: str, datafile: str) -> None:
     """Write dictlist to JSON file in 'metadata' folder."""
     # Define location for output file
-    datafile_loc = os.path.join('metadata', datafile)
+    script_dir = os.path.dirname(__file__)
+    datafile_loc = os.path.join(script_dir, "metadata", datafile)
 
     # Add the update timestamp (in UTC)
     updated_dt = (datetime.datetime.now(datetime.timezone.utc)

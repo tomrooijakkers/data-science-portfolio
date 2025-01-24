@@ -1,0 +1,20 @@
+name: knmi-weather-env
+channels:
+  - defaults
+  - https://repo.anaconda.com/pkgs/main
+  - https://repo.anaconda.com/pkgs/r
+dependencies:
+  - python=3.12
+  - basemap
+  - cssselect
+  - lxml
+  - matplotlib
+  - numpy
+  - pandas
+  - requests
+  - scipy
+  - ipykernel
+  - scikit-learn
+  - pykrige
+  - basemap-data-hires
+prefix: /Users/Shared/anaconda3/envs/knmi-weather-env

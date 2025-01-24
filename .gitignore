@@ -166,3 +166,6 @@ cython_debug/
 
 # aider
 .aider*
+
+# MacOS clutter (lay-out config for views in Finder)
+.DS_store

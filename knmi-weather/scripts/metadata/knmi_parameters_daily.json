@@ -1,5 +1,5 @@
 {
-  "last_updated": "2024-11-18 21:31 UTC",
+  "last_updated": "2025-01-24 15:37 UTC",
   "source": "https://daggegevens.knmi.nl/klimatologie/daggegevens",
   "parameters": [
     {
@@ -116,7 +116,7 @@
     },
     {
       "parameter_code": "VVN",
-      "parameter_desc": "Minimum opgetreden zicht; 0: <100 m, 1:100-200 m, 2:200-300 m,..., 49:4900-5000 m, 50:5-6 km, 56:6-7 km, 57:7-8 km,..., 79:29-30 km, 80:30-35 km, 81:35-40 km,..., 89"
+      "parameter_desc": "\n\nMinimum opgetreden zicht; 0: <100 m, 1:100-200 m, 2:200-300 m,..., 49:4900-5000 m, 50:5-6 km, 56:6-7 km, 57:7-8 km,..., 79:29-30 km, 80:30-35 km, 81:35-40 km,..., 89: >70 km"
     },
     {
       "parameter_code": "VVNH",
@@ -124,7 +124,7 @@
     },
     {
       "parameter_code": "VVX",
-      "parameter_desc": "Maximum opgetreden zicht; 0: <100 m, 1:100-200 m, 2:200-300 m,..., 49:4900-5000 m, 50:5-6 km, 56:6-7 km, 57:7-8 km,..., 79:29-30 km, 80:30-35 km, 81:35-40 km,..., 89"
+      "parameter_desc": "\n\nMaximum opgetreden zicht; 0: <100 m, 1:100-200 m, 2:200-300 m,..., 49:4900-5000 m, 50:5-6 km, 56:6-7 km, 57:7-8 km,..., 79:29-30 km, 80:30-35 km, 81:35-40 km,..., 89: >70 km"
     },
     {
       "parameter_code": "VVXH",
