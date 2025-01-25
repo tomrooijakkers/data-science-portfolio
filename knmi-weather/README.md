@@ -121,7 +121,7 @@ At this point you should be ready to go - happy reading / coding!
     - ```02-knmi_data_visualization.ipynb```: Data analysis and visualizations.
     - ```03-knmi_drought_analysis.ipynb```: Drought analysis using SPI and SPEI.
     - ```knmi_weather_environment.yml```: Conda environment configuration (for ```conda``` users).
-    - ```requirements.txt```: Python dependencies (for ```pip``` users).
+    - ```knmi_weather_requirements.txt```: Python dependencies (for ```pip``` users).
     - ```scripts/``` <em>directory</em>: Python helper scripts for powering the workflows in the Jupyter Notebooks.
         - ```metadata/``` <em>subdirectory</em>: JSON files for station and parameter metadata (loaded dynamically).
         - ```transform/``` <em>subdirectory</em>: JSON files for (pre-)cleaning data transformation rules; can be changed to your preference.
