@@ -20,6 +20,15 @@ Each of the following Notebooks can be used and run on a stand-alone basis.
 
 [03-knmi_drought_analysis.ipynb](./03-knmi_drought_analysis.ipynb): Clarifies how to analyze and quantify periods of drought and wetness using Standardized Indexes (SPI and SPEI), and contains a MICE-based data imputation.
 
+## Visualization Examples
+![Image - 2023 KNMI NL Solar Irradiance ($kWh/m^2$)](./images/KNMI_NL_solar_irrad_2023.png)
+
+![Image - 2023 KNMI NL Wind Power ($kWh/m^2$)](./images/KNMI_NL_wind_power_2023.png)
+
+![Image - KNMI MICE results - Soesterberg](./images/KNMI_MICE_Soesterberg.png)
+
+![Image - KNMI SPEI De Bilt (categorized)](./images/KNMI_SPEI_De_Bilt_cat.png)
+
 ## Getting Started
 
 To get started with this project, you need to set up the required environment and dependencies. Follow the steps below to create and activate the virtual environment.
